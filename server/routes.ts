@@ -1,20 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertQuizAssessmentSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
   // Initialize static data
   await storage.initializeStaticData();
 
   // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = '123e4567-e89b-12d3-a456-426614174000'; // Placeholder
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
@@ -48,9 +44,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Quiz routes
-  app.post('/api/quiz/submit', isAuthenticated, async (req: any, res) => {
+  app.post('/api/quiz/submit', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = '123e4567-e89b-12d3-a456-426614174000'; // Placeholder
       const validatedData = insertQuizAssessmentSchema.parse({
         userId,
         responses: req.body.responses,
@@ -77,9 +73,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/quiz/results', isAuthenticated, async (req: any, res) => {
+  app.get('/api/quiz/results', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = '123e4567-e89b-12d3-a456-426614174000'; // Placeholder
       const matches = await storage.getUserCareerMatches(userId);
       res.json(matches);
     } catch (error) {

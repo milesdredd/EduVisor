@@ -1,3 +1,4 @@
+import { UserCareerMatch } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -137,13 +138,13 @@ export default function QuizResults() {
           <h2 className="text-3xl font-bold mb-8 text-center text-foreground">Your Recommended Career Paths</h2>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {careerMatches.map((match: any, index: number) => (
-              <Link key={match.id} href={`/career/${match.careerPath.id}`}>
+            {(careerMatches as UserCareerMatch[]).map((match, index) => (
+              <Link key={match.id} href={`/career/${(match.careerPath as any).id}`}>
                 <div className="bg-card rounded-2xl p-6 border border-border hover-scale shadow-lg group cursor-pointer career-card shimmer relative overflow-hidden"
-                     data-testid={`career-card-${match.careerPath.id}`}>
+                     data-testid={`career-card-${(match.careerPath as any).id}`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className={`w-12 h-12 bg-gradient-to-r ${getCareerGradient(index)} rounded-xl flex items-center justify-center`}>
-                      {getCareerIcon(match.careerPath.title)}
+                      {getCareerIcon((match.careerPath as any).title)}
                     </div>
                     <div className="text-right">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${getMatchColor(match.matchPercentage)}`}>
@@ -152,20 +153,20 @@ export default function QuizResults() {
                     </div>
                   </div>
                   <h3 className="text-xl font-semibold mb-2 text-foreground group-hover:text-primary transition-colors">
-                    {match.careerPath.title}
+                    {(match.careerPath as any).title}
                   </h3>
-                  <p className="text-muted-foreground mb-4">{match.careerPath.description}</p>
+                  <p className="text-muted-foreground mb-4">{(match.careerPath as any).description}</p>
 
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Average Salary</span>
                       <span className="text-sm font-medium text-foreground">
-                        ₹{(match.careerPath.averageSalaryMin / 100000).toFixed(1)}-{(match.careerPath.averageSalaryMax / 100000).toFixed(1)} LPA
+                        ₹{((match.careerPath as any).averageSalaryMin / 100000).toFixed(1)}-{((match.careerPath as any).averageSalaryMax / 100000).toFixed(1)} LPA
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Job Growth</span>
-                      <span className="text-sm font-medium text-green-600">+{match.careerPath.jobGrowthRate}% annually</span>
+                      <span className="text-sm font-medium text-green-600">+{(match.careerPath as any).jobGrowthRate}% annually</span>
                     </div>
                   </div>
 

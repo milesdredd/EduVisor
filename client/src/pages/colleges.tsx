@@ -1,3 +1,12 @@
+interface Program {
+  name: string;
+}
+
+interface Facility {
+  name: string;
+}
+
+import { College } from "@shared/schema";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
@@ -31,7 +40,7 @@ export default function Colleges() {
     data: colleges,
     isLoading: collegesLoading,
     error,
-  } = useQuery({
+  } = useQuery<College[]>({
     queryKey: ["/api/colleges", selectedStream, searchQuery],
     enabled: isAuthenticated,
     retry: false,
@@ -263,10 +272,10 @@ export default function Colleges() {
                 <div className="mb-6">
                   <h4 className="font-semibold mb-2 text-foreground">Facilities</h4>
                   <div className="grid grid-cols-2 gap-2 text-sm">
-                    {college.facilities?.slice(0, 4).map((facility: string, index: number) => (
+                    {(college.facilities as Facility[])?.slice(0, 4).map((facility, index) => (
                       <div key={index} className="flex items-center space-x-2">
                         <Check className="w-4 h-4 text-accent" />
-                        <span className="text-muted-foreground">{facility}</span>
+                        <span className="text-muted-foreground">{facility.name}</span>
                       </div>
                     ))}
                   </div>

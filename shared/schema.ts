@@ -74,6 +74,17 @@ export const colleges = pgTable("colleges", {
   rating: real("rating"),
   distance: real("distance"),
   imageUrl: varchar("image_url"),
+  // Advanced filtering fields
+  averagePackage: integer("average_package"), // In lakhs
+  highestPackage: integer("highest_package"), // In lakhs
+  mediumOfInstruction: varchar("medium_of_instruction").default("English"),
+  accreditation: varchar("accreditation"), // NAAC, NBA, etc.
+  affiliatedUniversity: varchar("affiliated_university"),
+  hostelFacility: boolean("hostel_facility").default(false),
+  libraryFacility: boolean("library_facility").default(false),
+  sportsComplex: boolean("sports_complex").default(false),
+  medicalFacility: boolean("medical_facility").default(false),
+  researchFacility: boolean("research_facility").default(false),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -84,7 +95,37 @@ export const userCareerMatches = pgTable("user_career_matches", {
   careerPathId: varchar("career_path_id").notNull().references(() => careerPaths.id),
   matchPercentage: real("match_percentage").notNull(),
   assessmentId: varchar("assessment_id").references(() => quizAssessments.id),
+  aiRecommendation: text("ai_recommendation"), // AI-generated career insight
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Timeline tracker for admission dates and deadlines
+export const timelineEvents = pgTable("timeline_events", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: varchar("title").notNull(),
+  description: text("description"),
+  eventDate: timestamp("event_date").notNull(),
+  eventType: varchar("event_type").notNull(), // admission, scholarship, exam, etc.
+  isCompleted: boolean("is_completed").default(false),
+  isNotified: boolean("is_notified").default(false),
+  collegeId: varchar("college_id").references(() => colleges.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User preferences for notifications
+export const userNotificationPreferences = pgTable("user_notification_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  admissionDeadlines: boolean("admission_deadlines").default(true),
+  scholarshipDeadlines: boolean("scholarship_deadlines").default(true),
+  examDates: boolean("exam_dates").default(true),
+  emailNotifications: boolean("email_notifications").default(true),
+  pushNotifications: boolean("push_notifications").default(true),
+  reminderDaysBefore: integer("reminder_days_before").default(7),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export type UpsertUser = typeof users.$inferInsert;
@@ -95,8 +136,29 @@ export type InsertCareerPath = typeof careerPaths.$inferInsert;
 export type CareerPath = typeof careerPaths.$inferSelect;
 export type InsertCollege = typeof colleges.$inferInsert;
 export type College = typeof colleges.$inferSelect;
+
 export type InsertUserCareerMatch = typeof userCareerMatches.$inferInsert;
-export type UserCareerMatch = typeof userCareerMatches.$inferSelect;
+export type UserCareerMatch = typeof userCareerMatches.$inferSelect & {
+  careerPath?: {
+    id: string;
+    title: string;
+    description: string;
+    averageSalaryMin: number;
+    averageSalaryMax: number;
+    jobGrowthRate: number;
+  };
+};
+
+export type InsertTimelineEvent = typeof timelineEvents.$inferInsert;
+export type TimelineEvent = typeof timelineEvents.$inferSelect;
+
+export type InsertUserNotificationPreferences = typeof userNotificationPreferences.$inferInsert;
+export type UserNotificationPreferences = typeof userNotificationPreferences.$inferSelect;
+
+export type InsertTimelineEvent = typeof timelineEvents.$inferInsert;
+export type TimelineEvent = typeof timelineEvents.$inferSelect;
+export type InsertUserNotificationPreferences = typeof userNotificationPreferences.$inferInsert;
+export type UserNotificationPreferences = typeof userNotificationPreferences.$inferSelect;
 
 export const insertQuizAssessmentSchema = createInsertSchema(quizAssessments).omit({
   id: true,
@@ -106,4 +168,16 @@ export const insertQuizAssessmentSchema = createInsertSchema(quizAssessments).om
 export const insertCollegeSchema = createInsertSchema(colleges).omit({
   id: true,
   createdAt: true,
+});
+
+export const insertTimelineEventSchema = createInsertSchema(timelineEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserNotificationPreferencesSchema = createInsertSchema(userNotificationPreferences).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });

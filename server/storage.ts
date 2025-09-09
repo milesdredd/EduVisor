@@ -4,6 +4,8 @@ import {
   careerPaths,
   quizAssessments,
   userCareerMatches,
+  timelineEvents,
+  userNotificationPreferences,
   type User,
   type UpsertUser,
   type College,
@@ -14,9 +16,13 @@ import {
   type InsertQuizAssessment,
   type UserCareerMatch,
   type InsertUserCareerMatch,
+  type TimelineEvent,
+  type InsertTimelineEvent,
+  type UserNotificationPreferences,
+  type InsertUserNotificationPreferences,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and } from "drizzle-orm";
+import { eq, desc, asc, and, ilike, sql, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (mandatory for Replit Auth)
@@ -32,11 +38,24 @@ export interface IStorage {
   getCareerPath(id: string): Promise<CareerPath | undefined>;
   saveUserCareerMatches(matches: InsertUserCareerMatch[]): Promise<void>;
   getUserCareerMatches(userId: string): Promise<(UserCareerMatch & { careerPath: CareerPath })[]>;
+  updateCareerMatchWithAI(matchId: string, aiRecommendation: string): Promise<void>;
   
   // College operations
   getAllColleges(): Promise<College[]>;
   getCollegesByStream(stream?: string): Promise<College[]>;
   searchColleges(query: string): Promise<College[]>;
+  getCollegesWithAdvancedFilters(filters: any): Promise<College[]>;
+  
+  // Timeline operations
+  createTimelineEvent(event: InsertTimelineEvent): Promise<TimelineEvent>;
+  getUserTimelineEvents(userId: string): Promise<TimelineEvent[]>;
+  updateTimelineEvent(eventId: string, updates: Partial<TimelineEvent>): Promise<void>;
+  deleteTimelineEvent(eventId: string): Promise<void>;
+  getUpcomingEvents(userId: string, days?: number): Promise<TimelineEvent[]>;
+  
+  // Notification preferences
+  getUserNotificationPreferences(userId: string): Promise<UserNotificationPreferences | undefined>;
+  upsertUserNotificationPreferences(prefs: InsertUserNotificationPreferences): Promise<UserNotificationPreferences>;
   
   // Initialize data
   initializeStaticData(): Promise<void>;
@@ -100,6 +119,7 @@ export class DatabaseStorage implements IStorage {
         careerPathId: userCareerMatches.careerPathId,
         matchPercentage: userCareerMatches.matchPercentage,
         assessmentId: userCareerMatches.assessmentId,
+        aiRecommendation: userCareerMatches.aiRecommendation,
         createdAt: userCareerMatches.createdAt,
         careerPath: careerPaths,
       })
@@ -110,6 +130,13 @@ export class DatabaseStorage implements IStorage {
     
     // Filter out null career paths
     return results.filter(result => result.careerPath !== null) as (UserCareerMatch & { careerPath: CareerPath })[];
+  }
+
+  async updateCareerMatchWithAI(matchId: string, aiRecommendation: string): Promise<void> {
+    await db
+      .update(userCareerMatches)
+      .set({ aiRecommendation })
+      .where(eq(userCareerMatches.id, matchId));
   }
 
   // College operations
@@ -125,8 +152,131 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchColleges(query: string): Promise<College[]> {
-    // For now, return all colleges. In production, implement proper search
-    return this.getAllColleges();
+    if (!query.trim()) return this.getAllColleges();
+    
+    return await db
+      .select()
+      .from(colleges)
+      .where(
+        ilike(colleges.name, `%${query}%`)
+      )
+      .orderBy(asc(colleges.distance));
+  }
+
+  async getCollegesWithAdvancedFilters(filters: any): Promise<College[]> {
+    let whereConditions = [];
+    
+    if (filters.stream && filters.stream !== 'All Streams') {
+      // Filter by program stream
+      whereConditions.push(sql`${colleges.programs}::text ILIKE ${'%' + filters.stream + '%'}`);
+    }
+    
+    if (filters.location) {
+      whereConditions.push(ilike(colleges.location, `%${filters.location}%`));
+    }
+    
+    if (filters.minFees !== undefined) {
+      whereConditions.push(gte(colleges.fees, filters.minFees));
+    }
+    
+    if (filters.maxFees !== undefined) {
+      whereConditions.push(lte(colleges.fees, filters.maxFees));
+    }
+    
+    if (filters.minPlacement !== undefined) {
+      whereConditions.push(gte(colleges.placementRate, filters.minPlacement));
+    }
+    
+    if (filters.mediumOfInstruction) {
+      whereConditions.push(eq(colleges.mediumOfInstruction, filters.mediumOfInstruction));
+    }
+    
+    if (filters.hostelFacility) {
+      whereConditions.push(eq(colleges.hostelFacility, true));
+    }
+    
+    if (filters.libraryFacility) {
+      whereConditions.push(eq(colleges.libraryFacility, true));
+    }
+    
+    if (filters.sportsComplex) {
+      whereConditions.push(eq(colleges.sportsComplex, true));
+    }
+    
+    const query = db.select().from(colleges);
+    
+    if (whereConditions.length > 0) {
+      query.where(and(...whereConditions));
+    }
+    
+    return await query.orderBy(asc(colleges.distance));
+  }
+
+  // Timeline operations
+  async createTimelineEvent(event: InsertTimelineEvent): Promise<TimelineEvent> {
+    const [result] = await db.insert(timelineEvents).values(event).returning();
+    return result;
+  }
+
+  async getUserTimelineEvents(userId: string): Promise<TimelineEvent[]> {
+    return await db
+      .select()
+      .from(timelineEvents)
+      .where(eq(timelineEvents.userId, userId))
+      .orderBy(asc(timelineEvents.eventDate));
+  }
+
+  async updateTimelineEvent(eventId: string, updates: Partial<TimelineEvent>): Promise<void> {
+    await db
+      .update(timelineEvents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(timelineEvents.id, eventId));
+  }
+
+  async deleteTimelineEvent(eventId: string): Promise<void> {
+    await db.delete(timelineEvents).where(eq(timelineEvents.id, eventId));
+  }
+
+  async getUpcomingEvents(userId: string, days: number = 30): Promise<TimelineEvent[]> {
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+    
+    return await db
+      .select()
+      .from(timelineEvents)
+      .where(
+        and(
+          eq(timelineEvents.userId, userId),
+          gte(timelineEvents.eventDate, new Date()),
+          lte(timelineEvents.eventDate, futureDate),
+          eq(timelineEvents.isCompleted, false)
+        )
+      )
+      .orderBy(asc(timelineEvents.eventDate));
+  }
+
+  // Notification preferences
+  async getUserNotificationPreferences(userId: string): Promise<UserNotificationPreferences | undefined> {
+    const [prefs] = await db
+      .select()
+      .from(userNotificationPreferences)
+      .where(eq(userNotificationPreferences.userId, userId));
+    return prefs;
+  }
+
+  async upsertUserNotificationPreferences(prefs: InsertUserNotificationPreferences): Promise<UserNotificationPreferences> {
+    const [result] = await db
+      .insert(userNotificationPreferences)
+      .values(prefs)
+      .onConflictDoUpdate({
+        target: userNotificationPreferences.userId,
+        set: {
+          ...prefs,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return result;
   }
 
   async initializeStaticData(): Promise<void> {
@@ -250,7 +400,17 @@ export class DatabaseStorage implements IStorage {
         facilities: ["Hostel", "Central Library", "Research Labs", "Wi-Fi Campus"],
         rating: 4.8,
         distance: 12,
-        imageUrl: "https://images.unsplash.com/photo-1562774053-701939374585"
+        imageUrl: "https://images.unsplash.com/photo-1562774053-701939374585",
+        averagePackage: 18,
+        highestPackage: 50,
+        mediumOfInstruction: "English",
+        accreditation: "NAAC A++",
+        affiliatedUniversity: "Indian Institute of Technology Delhi",
+        hostelFacility: true,
+        libraryFacility: true,
+        sportsComplex: true,
+        medicalFacility: true,
+        researchFacility: true
       },
       {
         name: "Delhi Technological University",
@@ -264,7 +424,17 @@ export class DatabaseStorage implements IStorage {
         facilities: ["Hostel", "Library", "Internet", "Sports"],
         rating: 4.5,
         distance: 18,
-        imageUrl: "https://images.unsplash.com/photo-1562774053-701939374585"
+        imageUrl: "https://images.unsplash.com/photo-1562774053-701939374585",
+        averagePackage: 12,
+        highestPackage: 35,
+        mediumOfInstruction: "English",
+        accreditation: "NAAC A+",
+        affiliatedUniversity: "Delhi Technological University",
+        hostelFacility: true,
+        libraryFacility: true,
+        sportsComplex: true,
+        medicalFacility: false,
+        researchFacility: true
       },
       {
         name: "All India Institute of Medical Sciences",
@@ -278,7 +448,17 @@ export class DatabaseStorage implements IStorage {
         facilities: ["Teaching Hospital", "Research Centers", "Medical Library", "Student Clinics"],
         rating: 4.9,
         distance: 15,
-        imageUrl: "https://images.unsplash.com/photo-1551076805-e1869033e561"
+        imageUrl: "https://images.unsplash.com/photo-1551076805-e1869033e561",
+        averagePackage: 15,
+        highestPackage: 25,
+        mediumOfInstruction: "English",
+        accreditation: "NAAC A++",
+        affiliatedUniversity: "All India Institute of Medical Sciences",
+        hostelFacility: true,
+        libraryFacility: true,
+        sportsComplex: true,
+        medicalFacility: true,
+        researchFacility: true
       },
       {
         name: "Delhi University - Shaheed Sukhdev College of Business Studies",
@@ -292,7 +472,17 @@ export class DatabaseStorage implements IStorage {
         facilities: ["Computer Labs", "Business Library", "Seminar Halls", "Placement Cell"],
         rating: 4.4,
         distance: 10,
-        imageUrl: "https://images.unsplash.com/photo-1497486751825-1233686d5d80"
+        imageUrl: "https://images.unsplash.com/photo-1497486751825-1233686d5d80",
+        averagePackage: 8,
+        highestPackage: 20,
+        mediumOfInstruction: "English",
+        accreditation: "NAAC A",
+        affiliatedUniversity: "University of Delhi",
+        hostelFacility: false,
+        libraryFacility: true,
+        sportsComplex: false,
+        medicalFacility: false,
+        researchFacility: false
       },
       {
         name: "Delhi University",
@@ -306,7 +496,17 @@ export class DatabaseStorage implements IStorage {
         facilities: ["Student Housing", "Multiple Libraries", "Sports Complex", "Career Services"],
         rating: 4.6,
         distance: 8,
-        imageUrl: "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3"
+        imageUrl: "https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3",
+        averagePackage: 6,
+        highestPackage: 15,
+        mediumOfInstruction: "English",
+        accreditation: "NAAC A+",
+        affiliatedUniversity: "University of Delhi",
+        hostelFacility: true,
+        libraryFacility: true,
+        sportsComplex: true,
+        medicalFacility: true,
+        researchFacility: true
       }
     ];
 

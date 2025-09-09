@@ -1,0 +1,1495 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPath - Digital Guidance Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                    colors: {
+                        background: "var(--background)",
+                        foreground: "var(--foreground)",
+                        card: {
+                            DEFAULT: "var(--card)",
+                            foreground: "var(--card-foreground)",
+                        },
+                        primary: {
+                            DEFAULT: "var(--primary)",
+                            foreground: "var(--primary-foreground)",
+                        },
+                        secondary: {
+                            DEFAULT: "var(--secondary)",
+                            foreground: "var(--secondary-foreground)",
+                        },
+                        muted: {
+                            DEFAULT: "var(--muted)",
+                            foreground: "var(--muted-foreground)",
+                        },
+                        accent: {
+                            DEFAULT: "var(--accent)",
+                            foreground: "var(--accent-foreground)",
+                        },
+                        destructive: {
+                            DEFAULT: "var(--destructive)",
+                            foreground: "var(--destructive-foreground)",
+                        },
+                        border: "var(--border)",
+                        input: "var(--input)",
+                        ring: "var(--ring)",
+                        success: "var(--success)",
+                        warning: "var(--warning)"
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    }
+                },
+            }
+        };
+    </script>
+    <style>
+        :root {
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(222.2 84% 4.9%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(222.2 84% 4.9%);
+            --primary: hsl(210 83% 53%);
+            --primary-foreground: hsl(210 40% 98%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(222.2 47.4% 11.2%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(215.4 16.3% 46.9%);
+            --accent: hsl(210 40% 96%);
+            --accent-foreground: hsl(222.2 47.4% 11.2%);
+            --destructive: hsl(0 72.22% 50.59%);
+            --destructive-foreground: hsl(210 40% 98%);
+            --border: hsl(214.3 31.8% 91.4%);
+            --input: hsl(214.3 31.8% 91.4%);
+            --ring: hsl(210 83% 53%);
+            --radius: 8px;
+            --success: hsl(142 76% 36%);
+            --warning: hsl(38 92% 50%);
+        }
+        
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        .quiz-option {
+            transition: all 0.2s ease;
+        }
+        
+        .quiz-option:hover {
+            transform: translateY(-1px);
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        
+        .career-card {
+            transition: all 0.2s ease;
+        }
+        
+        .career-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground min-h-screen font-sans">
+
+    <!-- Login/Registration Section -->
+    <!-- @COMPONENT: LoginPage [handles user authentication] -->
+    <div id="login-section" class="page-section active">
+        <div class="min-h-screen flex">
+            <!-- Left Panel - Welcome Content -->
+            <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary to-accent relative overflow-hidden">
+                <!-- Abstract educational pattern background -->
+                <div class="absolute inset-0 opacity-10">
+                    <div class="w-full h-full" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%222%22 fill=%22white%22/><circle cx=%2220%22 cy=%2220%22 r=%221.5%22 fill=%22white%22/><circle cx=%2280%22 cy=%2230%22 r=%221%22 fill=%22white%22/></svg>'); background-size: 80px 80px;"></div>
+                </div>
+                
+                <div class="relative z-10 flex flex-col justify-center px-12 text-white">
+                    <div class="mb-8">
+                        <h1 class="text-4xl font-bold mb-4">Welcome to EduPath</h1>
+                        <p class="text-xl opacity-90 mb-6">Your personalized career guidance platform</p>
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-graduation-cap text-2xl"></i>
+                                <span class="text-lg">Discover your ideal career path</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-chart-line text-2xl"></i>
+                                <span class="text-lg">AI-powered recommendations</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-map-marker-alt text-2xl"></i>
+                                <span class="text-lg">Find nearby colleges</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Login Form -->
+            <div class="w-full lg:w-1/2 flex items-center justify-center p-8">
+                <div class="w-full max-w-md">
+                    <div class="text-center mb-8">
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-xl text-white"></i>
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-bold text-foreground">Sign in to EduPath</h2>
+                        <p class="text-muted-foreground mt-2">Continue your career discovery journey</p>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div id="login-form" class="space-y-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="email" class="block text-sm font-medium mb-2">Email Address</label>
+                                <input type="email" id="email" data-bind="user.email" 
+                                       class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                       placeholder="student@example.com" data-mock="true">
+                            </div>
+                            <div>
+                                <label for="password" class="block text-sm font-medium mb-2">Password</label>
+                                <input type="password" id="password" data-bind="user.password"
+                                       class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                       placeholder="••••••••" data-mock="true">
+                            </div>
+                        </div>
+
+                        <button data-event="click:handleLogin" data-implementation="Should validate credentials and redirect to home"
+                                class="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-6 rounded-md font-medium transition-colors">
+                            Sign In
+                        </button>
+
+                        <div class="text-center">
+                            <span class="text-muted-foreground">Don't have an account? </span>
+                            <button data-event="click:showRegister" class="text-primary hover:underline font-medium">Sign Up</button>
+                        </div>
+                    </div>
+
+                    <!-- Registration Form -->
+                    <div id="register-form" class="space-y-6 hidden">
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">First Name</label>
+                                    <input type="text" data-bind="user.firstName" 
+                                           class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                           placeholder="John" data-mock="true">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Last Name</label>
+                                    <input type="text" data-bind="user.lastName"
+                                           class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                           placeholder="Doe" data-mock="true">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Email Address</label>
+                                <input type="email" data-bind="user.email"
+                                       class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                       placeholder="john.doe@example.com" data-mock="true">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Password</label>
+                                <input type="password" data-bind="user.password"
+                                       class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                       placeholder="••••••••" data-mock="true">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Class</label>
+                                    <select data-bind="user.class" class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring">
+                                        <option data-mock="true">Select Class</option>
+                                        <option data-mock="true">Class 10</option>
+                                        <option data-mock="true">Class 11</option>
+                                        <option data-mock="true">Class 12</option>
+                                        <option data-mock="true">Graduate</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Age</label>
+                                    <input type="number" data-bind="user.age" min="14" max="25"
+                                           class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                           placeholder="18" data-mock="true">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button data-event="click:handleRegister" data-implementation="Should validate form and create user account"
+                                class="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 px-6 rounded-md font-medium transition-colors">
+                            Create Account
+                        </button>
+
+                        <div class="text-center">
+                            <span class="text-muted-foreground">Already have an account? </span>
+                            <button data-event="click:showLogin" class="text-primary hover:underline font-medium">Sign In</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LoginPage -->
+
+    <!-- Home Page Section -->
+    <!-- @COMPONENT: HomePage [displays educational content and navigation] -->
+    <div id="home-section" class="page-section">
+        <!-- Navigation Header -->
+        <nav class="bg-card shadow-sm border-b border-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-lg text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">EduPath</span>
+                    </div>
+                    
+                    <div class="hidden md:flex items-center gap-6">
+                        <a href="#" class="text-foreground hover:text-primary transition-colors">Home</a>
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">Quiz</a>
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">Colleges</a>
+                        <a href="#" class="text-muted-foreground hover:text-primary transition-colors">Profile</a>
+                    </div>
+
+                    <div class="flex items-center gap-4">
+                        <div class="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+                            <span class="text-sm font-medium" data-bind="user.initials" data-mock="true">JD</span>
+                        </div>
+                        <button data-event="click:logout" class="text-muted-foreground hover:text-foreground">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Hero Section -->
+            <div class="bg-gradient-to-r from-primary to-accent rounded-2xl text-white p-8 mb-12 relative overflow-hidden">
+                <!-- Abstract education icons background -->
+                <div class="absolute right-4 top-4 opacity-20 text-6xl">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div class="absolute right-16 bottom-4 opacity-15 text-4xl">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                
+                <div class="relative z-10">
+                    <h1 class="text-4xl font-bold mb-4">Welcome back, <span data-bind="user.firstName" data-mock="true">John</span>!</h1>
+                    <p class="text-xl opacity-90 mb-6">Ready to discover your perfect career path?</p>
+                    <button data-event="click:startQuiz" data-implementation="Navigate to quiz section"
+                            class="bg-white text-primary hover:bg-gray-50 px-8 py-3 rounded-lg font-medium transition-colors">
+                        Start Career Assessment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Why Graduation Matters Section -->
+            <div class="mb-16">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">Why Higher Education Matters</h2>
+                    <p class="text-lg text-muted-foreground max-w-3xl mx-auto">
+                        Understanding the importance of graduation and how it shapes your future career prospects
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Benefit Card 1 -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <div class="w-16 h-16 bg-success/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-chart-line text-2xl text-success"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Higher Earning Potential</h3>
+                        <p class="text-muted-foreground">Graduates earn 84% more over their lifetime compared to those with only high school education.</p>
+                    </div>
+
+                    <!-- Benefit Card 2 -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-brain text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Critical Thinking Skills</h3>
+                        <p class="text-muted-foreground">Develop analytical and problem-solving abilities essential in today's knowledge economy.</p>
+                    </div>
+
+                    <!-- Benefit Card 3 -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <div class="w-16 h-16 bg-warning/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-network-wired text-2xl text-warning"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Professional Network</h3>
+                        <p class="text-muted-foreground">Build valuable connections with peers, professors, and industry professionals.</p>
+                    </div>
+
+                    <!-- Benefit Card 4 -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <div class="w-16 h-16 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-door-open text-2xl text-primary"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Career Opportunities</h3>
+                        <p class="text-muted-foreground">Access to specialized fields and leadership positions that require higher education.</p>
+                    </div>
+
+                    <!-- Benefit Card 5 -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <div class="w-16 h-16 bg-destructive/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-shield-alt text-2xl text-destructive"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Job Security</h3>
+                        <p class="text-muted-foreground">Lower unemployment rates and greater job stability during economic downturns.</p>
+                    </div>
+
+                    <!-- Benefit Card 6 -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <div class="w-16 h-16 bg-success/10 rounded-lg flex items-center justify-center mb-4">
+                            <i class="fas fa-user-friends text-2xl text-success"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Personal Growth</h3>
+                        <p class="text-muted-foreground">Develop confidence, communication skills, and a broader worldview.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Section -->
+            <div class="bg-muted rounded-2xl p-8 mb-16">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold mb-2">Education Impact Statistics</h3>
+                    <p class="text-muted-foreground">Real data showing the value of higher education</p>
+                </div>
+                
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-primary mb-2" data-mock="true">84%</div>
+                        <div class="text-sm text-muted-foreground">Higher lifetime earnings</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-success mb-2" data-mock="true">3.7%</div>
+                        <div class="text-sm text-muted-foreground">Unemployment rate for graduates</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-warning mb-2" data-mock="true">67%</div>
+                        <div class="text-sm text-muted-foreground">Job satisfaction rate</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-destructive mb-2" data-mock="true">92%</div>
+                        <div class="text-sm text-muted-foreground">Would pursue degree again</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="text-center">
+                <h3 class="text-2xl font-bold mb-4">Ready to Find Your Path?</h3>
+                <p class="text-muted-foreground mb-8 max-w-2xl mx-auto">
+                    Take our comprehensive assessment to discover career paths that align with your interests, 
+                    strengths, and goals.
+                </p>
+                <button data-event="click:startQuiz" data-implementation="Navigate to quiz section"
+                        class="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-lg font-medium text-lg transition-colors">
+                    <i class="fas fa-play-circle mr-2"></i>
+                    Start Your Assessment
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: HomePage -->
+
+    <!-- Quiz Section -->
+    <!-- @COMPONENT: QuizPage [handles aptitude and interest assessment] -->
+    <div id="quiz-section" class="page-section">
+        <nav class="bg-card shadow-sm border-b border-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-3">
+                        <button data-event="click:goHome" class="text-muted-foreground hover:text-foreground">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-lg text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">EduPath</span>
+                    </div>
+                    <div class="text-sm text-muted-foreground">Career Assessment</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Progress Header -->
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-2xl font-bold">Career Aptitude Assessment</h1>
+                    <span class="text-sm text-muted-foreground">
+                        Question <span data-bind="quiz.currentQuestion" data-mock="true">3</span> of 
+                        <span data-bind="quiz.totalQuestions" data-mock="true">15</span>
+                    </span>
+                </div>
+                <div class="w-full bg-muted rounded-full h-2">
+                    <div class="progress-bar bg-primary h-2 rounded-full" style="width: 20%" data-bind="quiz.progressPercent"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Categories Navigation -->
+            <div class="grid grid-cols-3 gap-4 mb-8">
+                <div class="bg-primary text-primary-foreground rounded-lg p-4 text-center">
+                    <i class="fas fa-lightbulb text-2xl mb-2"></i>
+                    <div class="font-medium">Interests</div>
+                    <div class="text-xs opacity-80">5 questions</div>
+                </div>
+                <div class="bg-muted text-muted-foreground rounded-lg p-4 text-center">
+                    <i class="fas fa-cog text-2xl mb-2"></i>
+                    <div class="font-medium">Skills</div>
+                    <div class="text-xs">5 questions</div>
+                </div>
+                <div class="bg-muted text-muted-foreground rounded-lg p-4 text-center">
+                    <i class="fas fa-user text-2xl mb-2"></i>
+                    <div class="font-medium">Personality</div>
+                    <div class="text-xs">5 questions</div>
+                </div>
+            </div>
+
+            <!-- Current Question -->
+            <div class="bg-card rounded-xl p-8 shadow-sm border border-border mb-8">
+                <div class="mb-6">
+                    <span class="inline-block px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+                        Interest Assessment
+                    </span>
+                    <h2 class="text-xl font-semibold mb-4" data-bind="quiz.currentQuestionText" data-mock="true">
+                        Which of these activities do you find most engaging?
+                    </h2>
+                </div>
+
+                <!-- @STATE: selectedOption:string = null -->
+                <!-- Quiz Options -->
+                <div class="space-y-4">
+                    <label class="quiz-option flex items-center p-4 bg-muted/50 hover:bg-muted rounded-lg cursor-pointer border-2 border-transparent hover:border-border">
+                        <input type="radio" name="quiz-answer" value="A" class="sr-only" data-bind="quiz.selectedAnswer">
+                        <div class="flex-1 flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-paint-brush text-primary"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium" data-mock="true">Creating visual designs and artwork</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">Drawing, graphic design, photography</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="quiz-option flex items-center p-4 bg-muted/50 hover:bg-muted rounded-lg cursor-pointer border-2 border-transparent hover:border-border">
+                        <input type="radio" name="quiz-answer" value="B" class="sr-only">
+                        <div class="flex-1 flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calculator text-primary"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium" data-mock="true">Solving mathematical problems</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">Calculations, data analysis, logical reasoning</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="quiz-option flex items-center p-4 bg-muted/50 hover:bg-muted rounded-lg cursor-pointer border-2 border-transparent hover:border-border">
+                        <input type="radio" name="quiz-answer" value="C" class="sr-only">
+                        <div class="flex-1 flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-primary"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium" data-mock="true">Helping and counseling others</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">Teaching, social work, healthcare</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="quiz-option flex items-center p-4 bg-muted/50 hover:bg-muted rounded-lg cursor-pointer border-2 border-transparent hover:border-border">
+                        <input type="radio" name="quiz-answer" value="D" class="sr-only">
+                        <div class="flex-1 flex items-center gap-4">
+                            <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-laptop-code text-primary"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium" data-mock="true">Building and programming technology</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">Coding, engineering, innovation</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between mt-8">
+                    <button data-event="click:previousQuestion" 
+                            class="px-6 py-2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50">
+                        <i class="fas fa-chevron-left mr-2"></i>
+                        Previous
+                    </button>
+                    <button data-event="click:nextQuestion" data-implementation="Should save answer and proceed"
+                            class="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2 rounded-lg transition-colors">
+                        Next
+                        <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Categories Overview -->
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-card rounded-lg p-6 border border-border">
+                    <h3 class="font-semibold mb-3 flex items-center gap-2">
+                        <i class="fas fa-heart text-destructive"></i>
+                        Interest Assessment
+                    </h3>
+                    <p class="text-sm text-muted-foreground mb-4">Discover what subjects and activities genuinely excite you.</p>
+                    <div class="text-xs text-success font-medium">✓ Completed</div>
+                </div>
+
+                <div class="bg-card rounded-lg p-6 border border-border">
+                    <h3 class="font-semibold mb-3 flex items-center gap-2">
+                        <i class="fas fa-tools text-warning"></i>
+                        Skills Evaluation
+                    </h3>
+                    <p class="text-sm text-muted-foreground mb-4">Identify your natural abilities and developed competencies.</p>
+                    <div class="text-xs text-primary font-medium">In Progress</div>
+                </div>
+
+                <div class="bg-card rounded-lg p-6 border border-border">
+                    <h3 class="font-semibold mb-3 flex items-center gap-2">
+                        <i class="fas fa-user-circle text-accent-foreground"></i>
+                        Personality Traits
+                    </h3>
+                    <p class="text-sm text-muted-foreground mb-4">Understand your work style and preferred environments.</p>
+                    <div class="text-xs text-muted-foreground font-medium">Not Started</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: QuizPage -->
+
+    <!-- Quiz Results Section -->
+    <!-- @COMPONENT: QuizResults [displays career recommendations] -->
+    <div id="results-section" class="page-section">
+        <nav class="bg-card shadow-sm border-b border-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-3">
+                        <button data-event="click:goHome" class="text-muted-foreground hover:text-foreground">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-lg text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">EduPath</span>
+                    </div>
+                    <div class="text-sm text-muted-foreground">Your Results</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Results Header -->
+            <div class="text-center mb-12">
+                <div class="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-trophy text-3xl text-success"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-4">Your Career Assessment Results</h1>
+                <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+                    Based on your responses, we've identified career paths that align with your interests, 
+                    skills, and personality traits.
+                </p>
+            </div>
+
+            <!-- Recommended Career Paths -->
+            <div class="mb-12">
+                <h2 class="text-2xl font-bold mb-8">Recommended Career Paths</h2>
+                
+                <!-- @MAP: careerPaths.map(path => ( -->
+                <div class="grid gap-6">
+                    <!-- Career Path 1 -->
+                    <div class="career-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md cursor-pointer"
+                         data-event="click:viewCareerPath" data-path-id="software-engineering">
+                        <div class="flex items-start gap-6">
+                            <div class="w-16 h-16 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-code text-2xl text-primary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-semibold" data-mock="true">Software Engineering</h3>
+                                    <span class="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">92% Match</span>
+                                </div>
+                                <p class="text-muted-foreground mb-4" data-mock="true">
+                                    Design and develop software applications, websites, and digital solutions for various industries.
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Average Salary</div>
+                                        <div class="text-success font-semibold" data-mock="true">₹6-15 LPA</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Job Growth</div>
+                                        <div class="text-success font-semibold" data-mock="true">22% annually</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Programming</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Problem Solving</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Logical Thinking</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted-foreground"></i>
+                        </div>
+                    </div>
+
+                    <!-- Career Path 2 -->
+                    <div class="career-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md cursor-pointer"
+                         data-event="click:viewCareerPath" data-path-id="digital-marketing">
+                        <div class="flex items-start gap-6">
+                            <div class="w-16 h-16 bg-warning/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-bullhorn text-2xl text-warning"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-semibold" data-mock="true">Digital Marketing</h3>
+                                    <span class="px-3 py-1 bg-warning/10 text-warning rounded-full text-sm font-medium">88% Match</span>
+                                </div>
+                                <p class="text-muted-foreground mb-4" data-mock="true">
+                                    Create and manage online marketing campaigns, social media strategies, and brand communications.
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Average Salary</div>
+                                        <div class="text-success font-semibold" data-mock="true">₹4-12 LPA</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Job Growth</div>
+                                        <div class="text-success font-semibold" data-mock="true">18% annually</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Creativity</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Communication</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Analytics</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted-foreground"></i>
+                        </div>
+                    </div>
+
+                    <!-- Career Path 3 -->
+                    <div class="career-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md cursor-pointer"
+                         data-event="click:viewCareerPath" data-path-id="data-science">
+                        <div class="flex items-start gap-6">
+                            <div class="w-16 h-16 bg-accent/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-chart-bar text-2xl text-primary"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-semibold" data-mock="true">Data Science</h3>
+                                    <span class="px-3 py-1 bg-accent/20 text-accent-foreground rounded-full text-sm font-medium">85% Match</span>
+                                </div>
+                                <p class="text-muted-foreground mb-4" data-mock="true">
+                                    Analyze complex data to extract insights, build predictive models, and drive business decisions.
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Average Salary</div>
+                                        <div class="text-success font-semibold" data-mock="true">₹8-20 LPA</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Job Growth</div>
+                                        <div class="text-success font-semibold" data-mock="true">31% annually</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Statistics</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Programming</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Research</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted-foreground"></i>
+                        </div>
+                    </div>
+
+                    <!-- Career Path 4 -->
+                    <div class="career-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md cursor-pointer"
+                         data-event="click:viewCareerPath" data-path-id="psychology">
+                        <div class="flex items-start gap-6">
+                            <div class="w-16 h-16 bg-destructive/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-brain text-2xl text-destructive"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-semibold" data-mock="true">Psychology & Counseling</h3>
+                                    <span class="px-3 py-1 bg-destructive/10 text-destructive rounded-full text-sm font-medium">82% Match</span>
+                                </div>
+                                <p class="text-muted-foreground mb-4" data-mock="true">
+                                    Study human behavior, provide therapy, and help individuals overcome challenges and improve mental health.
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Average Salary</div>
+                                        <div class="text-success font-semibold" data-mock="true">₹3-10 LPA</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Job Growth</div>
+                                        <div class="text-success font-semibold" data-mock="true">14% annually</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Empathy</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Listening</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Analysis</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted-foreground"></i>
+                        </div>
+                    </div>
+
+                    <!-- Career Path 5 -->
+                    <div class="career-card bg-card rounded-xl p-6 shadow-sm border border-border hover:shadow-md cursor-pointer"
+                         data-event="click:viewCareerPath" data-path-id="business-management">
+                        <div class="flex items-start gap-6">
+                            <div class="w-16 h-16 bg-success/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i class="fas fa-briefcase text-2xl text-success"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <h3 class="text-xl font-semibold" data-mock="true">Business Management</h3>
+                                    <span class="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">79% Match</span>
+                                </div>
+                                <p class="text-muted-foreground mb-4" data-mock="true">
+                                    Lead teams, manage operations, develop strategies, and drive business growth across various industries.
+                                </p>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Average Salary</div>
+                                        <div class="text-success font-semibold" data-mock="true">₹5-18 LPA</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-foreground">Job Growth</div>
+                                        <div class="text-success font-semibold" data-mock="true">12% annually</div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Leadership</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Strategy</span>
+                                    <span class="px-2 py-1 bg-muted text-muted-foreground rounded text-sm" data-mock="true">Decision Making</span>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-muted-foreground"></i>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+            </div>
+
+            <!-- Next Steps -->
+            <div class="bg-muted rounded-2xl p-8 text-center">
+                <h3 class="text-2xl font-bold mb-4">Ready to Explore Your Options?</h3>
+                <p class="text-muted-foreground mb-6">Click on any career path above to see detailed information about courses, colleges, and opportunities.</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button data-event="click:retakeQuiz" 
+                            class="px-6 py-3 border border-border hover:bg-accent rounded-lg transition-colors">
+                        Retake Assessment
+                    </button>
+                    <button data-event="click:saveResults" 
+                            class="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-colors">
+                        Save Results
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: QuizResults -->
+
+    <!-- Career Path Detail Section -->
+    <!-- @COMPONENT: CareerPathDetail [shows detailed career information] -->
+    <div id="career-detail-section" class="page-section">
+        <nav class="bg-card shadow-sm border-b border-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-3">
+                        <button data-event="click:goBack" class="text-muted-foreground hover:text-foreground">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-lg text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">EduPath</span>
+                    </div>
+                    <div class="text-sm text-muted-foreground">Career Details</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Career Header -->
+            <div class="bg-gradient-to-r from-primary to-accent text-white rounded-2xl p-8 mb-8">
+                <div class="flex items-start gap-6">
+                    <div class="w-20 h-20 bg-white/10 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-code text-3xl text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h1 class="text-3xl font-bold mb-2" data-bind="career.title" data-mock="true">Software Engineering</h1>
+                        <p class="text-xl opacity-90 mb-4" data-mock="true">Build the digital future with code</p>
+                        <div class="flex items-center gap-4">
+                            <span class="px-3 py-1 bg-white/20 rounded-full text-sm font-medium">92% Match</span>
+                            <span class="flex items-center gap-2 text-sm">
+                                <i class="fas fa-users"></i>
+                                <span data-mock="true">4.2M+ professionals</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Job Opportunities -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                            <i class="fas fa-briefcase text-primary"></i>
+                            Job Opportunities
+                        </h2>
+                        
+                        <div class="grid gap-4">
+                            <!-- Job Category 1 -->
+                            <div class="border border-border rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold" data-mock="true">Software Developer</h3>
+                                    <span class="text-success font-medium" data-mock="true">₹6-12 LPA</span>
+                                </div>
+                                <p class="text-sm text-muted-foreground mb-3" data-mock="true">
+                                    Design, develop, and maintain software applications using various programming languages.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Java</span>
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Python</span>
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">React</span>
+                                </div>
+                            </div>
+
+                            <!-- Job Category 2 -->
+                            <div class="border border-border rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold" data-mock="true">Full Stack Engineer</h3>
+                                    <span class="text-success font-medium" data-mock="true">₹8-18 LPA</span>
+                                </div>
+                                <p class="text-sm text-muted-foreground mb-3" data-mock="true">
+                                    Work on both frontend and backend development of web applications.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">JavaScript</span>
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Node.js</span>
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Database</span>
+                                </div>
+                            </div>
+
+                            <!-- Job Category 3 -->
+                            <div class="border border-border rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-3">
+                                    <h3 class="font-semibold" data-mock="true">DevOps Engineer</h3>
+                                    <span class="text-success font-medium" data-mock="true">₹10-25 LPA</span>
+                                </div>
+                                <p class="text-sm text-muted-foreground mb-3" data-mock="true">
+                                    Manage deployment, infrastructure, and continuous integration/delivery pipelines.
+                                </p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">AWS</span>
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Docker</span>
+                                    <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Kubernetes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course to Career Mapping -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                            <i class="fas fa-route text-primary"></i>
+                            Educational Pathways
+                        </h2>
+                        
+                        <div class="space-y-6">
+                            <!-- Degree Path 1 -->
+                            <div class="border-l-4 border-primary pl-6">
+                                <h3 class="font-semibold text-lg mb-2" data-mock="true">B.Tech Computer Science</h3>
+                                <p class="text-muted-foreground mb-3" data-mock="true">4-year comprehensive program covering programming, algorithms, and system design</p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="font-medium">Duration:</span> <span data-mock="true">4 years</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Eligibility:</span> <span data-mock="true">12th Science (PCM)</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Entrance Exams:</span> <span data-mock="true">JEE Main, JEE Advanced</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Average Fees:</span> <span data-mock="true">₹50K-2L per year</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Degree Path 2 -->
+                            <div class="border-l-4 border-success pl-6">
+                                <h3 class="font-semibold text-lg mb-2" data-mock="true">BCA (Bachelor of Computer Applications)</h3>
+                                <p class="text-muted-foreground mb-3" data-mock="true">3-year focused program on software development and computer applications</p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="font-medium">Duration:</span> <span data-mock="true">3 years</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Eligibility:</span> <span data-mock="true">12th Any Stream</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Entrance Exams:</span> <span data-mock="true">BCA CET, University specific</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Average Fees:</span> <span data-mock="true">₹30K-1L per year</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Degree Path 3 -->
+                            <div class="border-l-4 border-warning pl-6">
+                                <h3 class="font-semibold text-lg mb-2" data-mock="true">B.Sc Computer Science</h3>
+                                <p class="text-muted-foreground mb-3" data-mock="true">3-year theoretical and practical computer science program</p>
+                                <div class="grid grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <span class="font-medium">Duration:</span> <span data-mock="true">3 years</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Eligibility:</span> <span data-mock="true">12th Science (PCM)</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Entrance Exams:</span> <span data-mock="true">University specific</span>
+                                    </div>
+                                    <div>
+                                        <span class="font-medium">Average Fees:</span> <span data-mock="true">₹25K-80K per year</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Skills Required -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                            <i class="fas fa-tools text-primary"></i>
+                            Required Skills & Preparation
+                        </h2>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="font-semibold mb-4">Technical Skills</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span data-mock="true">Programming Languages</span>
+                                        <div class="w-24 bg-muted rounded-full h-2">
+                                            <div class="bg-primary h-2 rounded-full" style="width: 90%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span data-mock="true">Problem Solving</span>
+                                        <div class="w-24 bg-muted rounded-full h-2">
+                                            <div class="bg-success h-2 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span data-mock="true">System Design</span>
+                                        <div class="w-24 bg-muted rounded-full h-2">
+                                            <div class="bg-warning h-2 rounded-full" style="width: 70%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 class="font-semibold mb-4">Soft Skills</h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span data-mock="true">Communication</span>
+                                        <div class="w-24 bg-muted rounded-full h-2">
+                                            <div class="bg-primary h-2 rounded-full" style="width: 80%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span data-mock="true">Teamwork</span>
+                                        <div class="w-24 bg-muted rounded-full h-2">
+                                            <div class="bg-success h-2 rounded-full" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span data-mock="true">Continuous Learning</span>
+                                        <div class="w-24 bg-muted rounded-full h-2">
+                                            <div class="bg-warning h-2 rounded-full" style="width: 95%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Quick Stats -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <h3 class="font-bold mb-4">Quick Stats</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-muted-foreground">Avg. Starting Salary</span>
+                                <span class="font-semibold text-success" data-mock="true">₹6 LPA</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-muted-foreground">Experience (5 years)</span>
+                                <span class="font-semibold text-success" data-mock="true">₹15 LPA</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-muted-foreground">Job Availability</span>
+                                <span class="font-semibold text-success" data-mock="true">High</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-muted-foreground">Remote Work</span>
+                                <span class="font-semibold text-success" data-mock="true">Excellent</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nearby Colleges -->
+                    <div class="bg-card rounded-xl p-6 shadow-sm border border-border">
+                        <h3 class="font-bold mb-4 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                            Nearby Government Colleges
+                        </h3>
+                        
+                        <!-- @MAP: nearbyColleges.map(college => ( -->
+                        <div class="space-y-4">
+                            <div class="border border-border rounded-lg p-4">
+                                <h4 class="font-medium mb-2" data-mock="true">IIT Delhi</h4>
+                                <div class="text-sm text-muted-foreground space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-map-marker-alt text-xs"></i>
+                                        <span data-mock="true">12.5 km away</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-star text-xs text-warning"></i>
+                                        <span data-mock="true">NIRF Rank: 2</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-cut text-xs"></i>
+                                        <span data-mock="true">JEE Cutoff: 250+</span>
+                                    </div>
+                                </div>
+                                <button class="mt-3 text-primary text-sm hover:underline" data-event="click:viewCollege">
+                                    View Details →
+                                </button>
+                            </div>
+
+                            <div class="border border-border rounded-lg p-4">
+                                <h4 class="font-medium mb-2" data-mock="true">DTU (Delhi Technological University)</h4>
+                                <div class="text-sm text-muted-foreground space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-map-marker-alt text-xs"></i>
+                                        <span data-mock="true">8.2 km away</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-star text-xs text-warning"></i>
+                                        <span data-mock="true">NIRF Rank: 36</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-cut text-xs"></i>
+                                        <span data-mock="true">JEE Cutoff: 180+</span>
+                                    </div>
+                                </div>
+                                <button class="mt-3 text-primary text-sm hover:underline" data-event="click:viewCollege">
+                                    View Details →
+                                </button>
+                            </div>
+
+                            <div class="border border-border rounded-lg p-4">
+                                <h4 class="font-medium mb-2" data-mock="true">IGDTUW</h4>
+                                <div class="text-sm text-muted-foreground space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-map-marker-alt text-xs"></i>
+                                        <span data-mock="true">15.1 km away</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-star text-xs text-warning"></i>
+                                        <span data-mock="true">NIRF Rank: 48</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-cut text-xs"></i>
+                                        <span data-mock="true">JEE Cutoff: 150+</span>
+                                    </div>
+                                </div>
+                                <button class="mt-3 text-primary text-sm hover:underline" data-event="click:viewCollege">
+                                    View Details →
+                                </button>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                        
+                        <button class="w-full mt-4 text-center py-3 border border-border rounded-lg text-primary hover:bg-primary/5 transition-colors"
+                                data-event="click:viewAllColleges">
+                            View All Colleges
+                        </button>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="space-y-3">
+                        <button class="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-lg transition-colors"
+                                data-event="click:saveCareerPath">
+                            <i class="fas fa-bookmark mr-2"></i>
+                            Save This Path
+                        </button>
+                        <button class="w-full border border-border hover:bg-accent py-3 rounded-lg transition-colors"
+                                data-event="click:compareCareer">
+                            <i class="fas fa-balance-scale mr-2"></i>
+                            Compare Paths
+                        </button>
+                        <button class="w-full border border-border hover:bg-accent py-3 rounded-lg transition-colors"
+                                data-event="click:getGuidance">
+                            <i class="fas fa-phone mr-2"></i>
+                            Get Guidance
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: CareerPathDetail -->
+
+    <!-- College Directory Section -->
+    <!-- @COMPONENT: CollegeDirectory [displays searchable college listings] -->
+    <div id="college-directory-section" class="page-section">
+        <nav class="bg-card shadow-sm border-b border-border">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center gap-3">
+                        <button data-event="click:goBack" class="text-muted-foreground hover:text-foreground">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-lg text-white"></i>
+                        </div>
+                        <span class="text-xl font-bold">EduPath</span>
+                    </div>
+                    <div class="text-sm text-muted-foreground">Government Colleges</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Search and Filters -->
+            <div class="bg-card rounded-xl p-6 shadow-sm border border-border mb-8">
+                <h1 class="text-2xl font-bold mb-6">Government College Directory</h1>
+                
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Search Colleges</label>
+                        <input type="text" placeholder="College name or location" 
+                               class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                               data-bind="search.query" data-mock="true">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Course Stream</label>
+                        <select class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                data-bind="filter.stream">
+                            <option data-mock="true">All Streams</option>
+                            <option data-mock="true">Engineering</option>
+                            <option data-mock="true">Science</option>
+                            <option data-mock="true">Arts</option>
+                            <option data-mock="true">Commerce</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Distance</label>
+                        <select class="w-full px-4 py-3 bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+                                data-bind="filter.distance">
+                            <option data-mock="true">Any Distance</option>
+                            <option data-mock="true">Within 5 km</option>
+                            <option data-mock="true">Within 10 km</option>
+                            <option data-mock="true">Within 25 km</option>
+                            <option data-mock="true">Within 50 km</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button class="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-md transition-colors"
+                                data-event="click:searchColleges">
+                            <i class="fas fa-search mr-2"></i>
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- College Results -->
+            <div class="space-y-6">
+                <!-- @MAP: colleges.map(college => ( -->
+                <!-- College Card 1 -->
+                <div class="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold mb-1" data-mock="true">Indian Institute of Technology, Delhi</h3>
+                                <div class="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                                    <span class="flex items-center gap-1">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span data-mock="true">Hauz Khas, New Delhi</span>
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <i class="fas fa-route"></i>
+                                        <span data-mock="true">12.5 km away</span>
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex items-center">
+                                        <!-- @MAP: Array(5).fill().map((_, i) => ( -->
+                                        <i class="fas fa-star text-warning text-sm"></i>
+                                        <!-- @END_MAP )) -->
+                                    </div>
+                                    <span class="text-sm text-muted-foreground" data-mock="true">NIRF Rank: 2</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-success/10 text-success rounded-full text-sm font-medium">Top Ranked</span>
+                        </div>
+
+                        <p class="text-muted-foreground mb-4" data-mock="true">
+                            Premier engineering institute offering undergraduate and postgraduate programs in technology and sciences.
+                        </p>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div>
+                                <div class="text-sm font-medium">Available Courses</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">B.Tech, M.Tech, PhD</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium">Fees (Annual)</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">₹2.5 Lakhs</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium">JEE Cutoff</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">250+ (General)</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium">Placement Rate</div>
+                                <div class="text-sm text-success font-semibold" data-mock="true">98%</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Hostel Available</span>
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Research Labs</span>
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Industry Partnerships</span>
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">International Exchange</span>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-4 rounded-lg transition-colors text-sm"
+                                    data-event="click:viewCollege" data-college-id="iit-delhi">
+                                View Details
+                            </button>
+                            <button class="px-4 py-2 border border-border hover:bg-accent rounded-lg transition-colors text-sm"
+                                    data-event="click:compareCollege">
+                                <i class="fas fa-balance-scale"></i>
+                            </button>
+                            <button class="px-4 py-2 border border-border hover:bg-accent rounded-lg transition-colors text-sm"
+                                    data-event="click:saveCollege">
+                                <i class="fas fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- College Card 2 -->
+                <div class="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                    <div class="p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold mb-1" data-mock="true">Delhi Technological University</h3>
+                                <div class="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                                    <span class="flex items-center gap-1">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span data-mock="true">Rohini, New Delhi</span>
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <i class="fas fa-route"></i>
+                                        <span data-mock="true">8.2 km away</span>
+                                    </span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-star text-warning text-sm"></i>
+                                        <i class="fas fa-star text-warning text-sm"></i>
+                                        <i class="fas fa-star text-warning text-sm"></i>
+                                        <i class="fas fa-star text-warning text-sm"></i>
+                                        <i class="far fa-star text-muted-foreground text-sm"></i>
+                                    </div>
+                                    <span class="text-sm text-muted-foreground" data-mock="true">NIRF Rank: 36</span>
+                                </div>
+                            </div>
+                            <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">Recommended</span>
+                        </div>
+
+                        <p class="text-muted-foreground mb-4" data-mock="true">
+                            Government-funded engineering university with strong industry connections and research programs.
+                        </p>
+
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div>
+                                <div class="text-sm font-medium">Available Courses</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">B.Tech, M.Tech</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium">Fees (Annual)</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">₹1.8 Lakhs</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium">JEE Cutoff</div>
+                                <div class="text-sm text-muted-foreground" data-mock="true">180+ (General)</div>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium">Placement Rate</div>
+                                <div class="text-sm text-success font-semibold" data-mock="true">94%</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Hostel Available</span>
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Library</span>
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Sports Complex</span>
+                            <span class="px-2 py-1 bg-primary/10 text-primary rounded text-xs" data-mock="true">Placement Cell</span>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button class="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-4 rounded-lg transition-colors text-sm"
+                                    data-event="click:viewCollege" data-college-id="dtu">
+                                View Details
+                            </button>
+                            <button class="px-4 py-2 border border-border hover:bg-accent rounded-lg transition-colors text-sm"
+                                    data-event="click:compareCollege">
+                                <i class="fas fa-balance-scale"></i>
+                            </button>
+                            <button class="px-4 py-2 border border-border hover:bg-accent rounded-lg transition-colors text-sm"
+                                    data-event="click:saveCollege">
+                                <i class="fas fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+                
+                <!-- Load More -->
+                <div class="text-center mt-8">
+                    <button class="border border-border hover:bg-accent px-6 py-3 rounded-lg transition-colors"
+                            data-event="click:loadMoreColleges">
+                        Load More Colleges
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: CollegeDirectory -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        (function() {
+            // Simple page navigation system for demo
+            const sections = document.querySelectorAll('.page-section');
+            let currentSection = 'login-section';
+
+            function showSection(sectionId) {
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionId).classList.add('active');
+                currentSection = sectionId;
+            }
+
+            // Login/Register form switching
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('[data-event*="showRegister"]')) {
+                    document.getElementById('login-form').classList.add('hidden');
+                    document.getElementById('register-form').classList.remove('hidden');
+                }
+                
+                if (e.target.matches('[data-event*="showLogin"]')) {
+                    document.getElementById('register-form').classList.add('hidden');
+                    document.getElementById('login-form').classList.remove('hidden');
+                }
+                
+                if (e.target.matches('[data-event*="handleLogin"]') || e.target.matches('[data-event*="handleRegister"]')) {
+                    e.preventDefault();
+                    showSection('home-section');
+                }
+                
+                if (e.target.matches('[data-event*="startQuiz"]')) {
+                    showSection('quiz-section');
+                }
+                
+                if (e.target.matches('[data-event*="nextQuestion"]')) {
+                    // Simulate quiz completion after a few questions
+                    showSection('results-section');
+                }
+                
+                if (e.target.matches('[data-event*="viewCareerPath"]')) {
+                    showSection('career-detail-section');
+                }
+                
+                if (e.target.matches('[data-event*="viewAllColleges"]')) {
+                    showSection('college-directory-section');
+                }
+                
+                if (e.target.matches('[data-event*="goHome"]')) {
+                    showSection('home-section');
+                }
+                
+                if (e.target.matches('[data-event*="goBack"]')) {
+                    // Simple back navigation
+                    if (currentSection === 'career-detail-section') {
+                        showSection('results-section');
+                    } else if (currentSection === 'college-directory-section') {
+                        showSection('career-detail-section');
+                    } else {
+                        showSection('home-section');
+                    }
+                }
+            });
+
+            // Quiz option selection highlighting
+            document.addEventListener('change', function(e) {
+                if (e.target.matches('input[name="quiz-answer"]')) {
+                    const options = document.querySelectorAll('.quiz-option');
+                    options.forEach(option => {
+                        option.classList.remove('border-primary', 'bg-primary/5');
+                        option.classList.add('border-transparent');
+                    });
+                    
+                    const selectedOption = e.target.closest('.quiz-option');
+                    selectedOption.classList.add('border-primary', 'bg-primary/5');
+                    selectedOption.classList.remove('border-transparent');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

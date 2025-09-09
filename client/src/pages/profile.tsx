@@ -1,3 +1,4 @@
+import { QuizAssessment } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -44,7 +45,7 @@ export default function Profile() {
   const {
     data: quizAssessments,
     isLoading: assessmentsLoading,
-  } = useQuery({
+  } = useQuery<QuizAssessment[]>({
     queryKey: ["/api/quiz/results"],
     enabled: isAuthenticated,
     retry: false,
@@ -88,7 +89,7 @@ export default function Profile() {
 
   // Mock data for demonstration - in real app this would come from API
   const profileStats = {
-    assessments: quizAssessments?.length || 0,
+    assessments: quizAssessments ? quizAssessments.length : 0,
     matches: 12,
     applications: 3,
     bookmarks: 8

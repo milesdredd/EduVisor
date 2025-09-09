@@ -1,3 +1,18 @@
+interface JobOpportunity {
+  title: string;
+  company: string;
+  salary: string;
+  experience: string;
+}
+
+interface RequiredSkill {
+  name: string;
+  importance: string;
+  proficiency: number;
+  description: string;
+}
+
+import { CareerPath } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRoute } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,7 +44,7 @@ export default function CareerDetails() {
     data: career,
     isLoading: careerLoading,
     error,
-  } = useQuery({
+  } = useQuery<CareerPath>({
     queryKey: ["/api/careers", params?.id],
     enabled: isAuthenticated && !!params?.id,
     retry: false,
@@ -125,7 +140,7 @@ export default function CareerDetails() {
               <h2 className="text-2xl font-bold mb-6 text-foreground">Job Opportunities & Salaries</h2>
 
               <div className="space-y-4">
-                {career.jobOpportunities?.map((job: any, index: number) => (
+                {(career.jobOpportunities as JobOpportunity[])?.map((job, index) => (
                   <div key={index} className="flex items-center justify-between p-4 bg-muted/30 rounded-xl" data-testid={`job-opportunity-${index}`}>
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
@@ -151,7 +166,7 @@ export default function CareerDetails() {
             <div className="bg-card rounded-2xl p-6 border border-border">
               <h3 className="text-xl font-bold mb-4 text-foreground">Required Skills</h3>
               <div className="space-y-3">
-                {career.requiredSkills?.map((skill: any, index: number) => (
+                {(career.requiredSkills as RequiredSkill[])?.map((skill, index) => (
                   <div key={index} data-testid={`skill-${index}`}>
                     <div className="flex justify-between mb-1">
                       <span className="text-sm font-medium text-foreground">{skill.name}</span>
