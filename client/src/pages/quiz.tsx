@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { quizQuestions, calculateCareerScores, getCareerMatches } from "@/lib/quiz-data";
+import { quizQuestions } from "@/lib/quiz-data";
 import { Heart, Brain, Lightbulb, Star, ArrowLeft, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,30 @@ export default function Quiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [responses, setResponses] = useState<Record<string, string>>({});
   const [selectedOption, setSelectedOption] = useState<string>("");
+
+  const careerMapping: Record<string, string> = {
+    "software developer": "Computer Science & IT",
+    "data scientist": "Computer Science & IT",
+    "it consultant": "Computer Science & IT",
+    "systems analyst": "Computer Science & IT",
+    "cybersecurity analyst": "Computer Science & IT",
+    "mechanical engineer": "Engineering",
+    "civil engineer": "Engineering",
+    "electrical engineer": "Engineering",
+    "business analyst": "Business & Management",
+    "marketing manager": "Business & Management",
+    "operations manager": "Business & Management",
+    "doctor": "Healthcare & Medicine",
+    "nurse": "Healthcare & Medicine",
+    "pharmacist": "Healthcare & Medicine",
+    "school teacher": "Education & Teaching",
+    "college professor": "Education & Teaching",
+    "education consultant": "Education & Teaching",
+  };
+
+  const { data: careers } = useQuery<any[]>({ queryKey: ["/api/careers"] });
+
+  console.log("Careers data in Quiz component:", careers);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -31,8 +55,59 @@ export default function Quiz() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
+  const analyzeQuizMutation = useMutation({
+    mutationFn: async (responses: Record<string, string>) => {
+      const response = await apiRequest("POST", "/api/analyze", { responses });
+      return response.json();
+    },
+    onSuccess: (data, responses) => {
+      console.log("AI Suggestions:", data.suggestions);
+      console.log("Available Careers:", careers);
+      const careerMatches = data.suggestions.map((suggestion: any) => {
+        const mappedCareerTitle = careerMapping[suggestion.career.toLowerCase()];
+        const career = careers?.find(c => c.title === mappedCareerTitle);
+        if (career) {
+          return {
+            careerPathId: career.id,
+            matchPercentage: 100, // AI suggestions are all considered top matches.
+          };
+        }
+        return null;
+      }).filter(Boolean);
+      console.log("Generated Career Matches:", careerMatches);
+
+      submitQuizMutation.mutate({
+        responses,
+        results: data,
+        careerMatches,
+      });
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to analyze quiz. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const submitQuizMutation = useMutation({
-    mutationFn: async (data: { responses: Record<string, string>; results: any }) => {
+    mutationFn: async (data: {
+      responses: Record<string, string>;
+      results: any;
+      careerMatches: any[];
+    }) => {
       const response = await apiRequest("POST", "/api/quiz/submit", data);
       return response.json();
     },
@@ -80,14 +155,7 @@ export default function Quiz() {
     if (currentQuestion < quizQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      // Calculate and submit results
-      const scores = calculateCareerScores(newResponses);
-      const matches = getCareerMatches(scores);
-      
-      submitQuizMutation.mutate({
-        responses: newResponses,
-        results: { scores, matches },
-      });
+      analyzeQuizMutation.mutate(newResponses);
     }
   };
 
@@ -214,7 +282,7 @@ export default function Quiz() {
             </button>
             <button
               onClick={handleNextQuestion}
-              disabled={!selectedOption || submitQuizMutation.isPending}
+              disabled={!selectedOption || analyzeQuizMutation.isPending || submitQuizMutation.isPending || (currentQuestion === quizQuestions.length - 1 && !careers)}
               className="flex items-center px-6 py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-next-question"
             >

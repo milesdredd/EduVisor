@@ -108,10 +108,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveUserCareerMatches(matches: InsertUserCareerMatch[]): Promise<void> {
-    await db.insert(userCareerMatches).values(matches);
+    console.log("Saving user career matches:", matches);
+    const result = await db.insert(userCareerMatches).values(matches).returning();
+    console.log("Saved user career matches result:", result);
   }
 
   async getUserCareerMatches(userId: string): Promise<(UserCareerMatch & { careerPath: CareerPath })[]> {
+    console.log("Fetching user career matches for userId:", userId);
     const results = await db
       .select({
         id: userCareerMatches.id,
@@ -127,9 +130,11 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(careerPaths, eq(userCareerMatches.careerPathId, careerPaths.id))
       .where(eq(userCareerMatches.userId, userId))
       .orderBy(desc(userCareerMatches.matchPercentage));
-    
+    console.log("Raw fetched results:", results);
     // Filter out null career paths
-    return results.filter(result => result.careerPath !== null) as (UserCareerMatch & { careerPath: CareerPath })[];
+    const filteredResults = results.filter(result => result.careerPath !== null) as (UserCareerMatch & { careerPath: CareerPath })[];
+    console.log("Filtered fetched results:", filteredResults);
+    return filteredResults;
   }
 
   async updateCareerMatchWithAI(matchId: string, aiRecommendation: string): Promise<void> {

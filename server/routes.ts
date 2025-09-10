@@ -2,6 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertQuizAssessmentSchema } from "@shared/schema";
+import * as schema from "@shared/schema";
+import { getCareerSuggestions } from "./openai";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize static data
@@ -46,7 +50,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Quiz routes
   app.post('/api/quiz/submit', async (req: any, res) => {
     try {
+      console.log("Received quiz submission request body:", req.body);
       const userId = '123e4567-e89b-12d3-a456-426614174000'; // Placeholder
+      // Check if user exists, if not, create them
+      const userList = await db.select().from(schema.users).where(eq(schema.users.id, userId));
+      let user = userList[0]; // get first user if exists
+
+      if (!user) {
+        // Assuming a basic user creation for testing purposes
+        await db.insert(schema.users).values({
+          id: userId,
+          email: `user-${userId}@example.com`,
+          firstName: 'Test',
+          lastName: 'User',
+        });
+      }
       const validatedData = insertQuizAssessmentSchema.parse({
         userId,
         responses: req.body.responses,
@@ -56,7 +74,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const assessment = await storage.saveQuizAssessment(validatedData);
       
       // Save career matches if provided
-      if (req.body.careerMatches) {
+      if (req.body.careerMatches && req.body.careerMatches.length > 0) {
         const matches = req.body.careerMatches.map((match: any) => ({
           userId,
           careerPathId: match.careerPathId,
@@ -64,12 +82,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
           assessmentId: assessment.id
         }));
         await storage.saveUserCareerMatches(matches);
+        console.log("Calling saveUserCareerMatches with:", matches);
       }
 
       res.json(assessment);
     } catch (error) {
       console.error("Error saving quiz assessment:", error);
       res.status(500).json({ message: "Failed to save assessment" });
+    }
+  });
+
+  app.post('/api/analyze', async (req, res) => {
+    try {
+      const { responses } = req.body;
+      const suggestions = await getCareerSuggestions(responses);
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Error analyzing quiz:", error);
+      res.status(500).json({ message: "Failed to analyze quiz" });
     }
   });
 
