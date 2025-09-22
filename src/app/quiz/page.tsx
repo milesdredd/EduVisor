@@ -14,6 +14,7 @@ import {
 import { useResultsStore } from '@/hooks/use-results-store';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 
 export default function QuizPage() {
   const router = useRouter();
@@ -36,19 +37,26 @@ export default function QuizPage() {
           <CardHeader>
             <CardTitle className="text-3xl font-headline">You've Already Taken the Quiz!</CardTitle>
             <CardDescription>
-              You can view your career suggestions or choose to retake the quiz.
+              Your personalized career suggestions are waiting for you.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-col items-center space-y-6">
             <Button asChild size="lg">
               <Link href="/results">
                 View My Results
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button variant="outline" onClick={handleRetakeQuiz}>
-              Retake Quiz
-            </Button>
+            
+            <div className="w-full space-y-4 pt-4">
+              <Separator />
+              <p className="text-sm text-muted-foreground italic">
+                "Not satisfied? Your path is yours to redefine."
+              </p>
+              <Button variant="outline" onClick={handleRetakeQuiz}>
+                Retake Quiz
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
