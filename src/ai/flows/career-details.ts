@@ -11,12 +11,12 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const CareerDetailsInputSchema = z.object({
+const CareerDetailsInputSchema = z.object({
   career: z.string().describe('The career title to get details for.'),
 });
 export type CareerDetailsInput = z.infer<typeof CareerDetailsInputSchema>;
 
-export const CareerDetailsOutputSchema = z.object({
+const CareerDetailsOutputSchema = z.object({
   title: z.string().describe('The title of the career.'),
   jobDuties: z
     .array(z.string())
