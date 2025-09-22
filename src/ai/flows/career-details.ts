@@ -65,18 +65,18 @@ const prompt = ai.definePrompt({
   name: 'careerDetailsPrompt',
   input: {schema: CareerDetailsInputSchema},
   output: {schema: CareerDetailsOutputSchema},
-  prompt: `You are an expert career counselor in India.
+  prompt: `You are an expert career counselor IN INDIA.
 Generate a detailed overview for the career: {{{career}}}.
-All information, especially scholarships and salary, must be relevant to India.
+ALL information, especially scholarships and salary, MUST be relevant to INDIA.
 Provide real, specific examples for all fields. Format URLs as valid links.
 
 - jobDuties: List 3-4 primary responsibilities.
 - requiredSkills: List 4-5 key technical and soft skills.
-- potentialSalary: Provide a realistic salary range in INR. Use the format "₹8,00,000 - ₹15,00,000 per year".
-- jobGrowth: State the projected growth rate.
-- entrepreneurialOptions: Suggest 2-3 freelance or business ideas.
-- scholarships: Name 3-4 actual scholarships available in India.
-- academicPathway: Summarize the educational path from school onwards.
+- potentialSalary: Provide a realistic salary range IN INR for INDIA. Use the format "₹8,00,000 - ₹15,00,000 per year".
+- jobGrowth: State the projected growth rate in INDIA.
+- entrepreneurialOptions: Suggest 2-3 freelance or business ideas relevant to the Indian market.
+- scholarships: Name 3-4 actual scholarships available IN INDIA.
+- academicPathway: Summarize the educational path within INDIA from school onwards.
 - studyMaterials: List 2-3 free online resources with valid URLs.
 `,
 });
