@@ -166,7 +166,7 @@ export default function DashboardPage() {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2"><CalendarDays /> Timeline Tracker</CardTitle>
-                            </Header>
+                            </CardHeader>
                             <CardContent className="space-y-4">
                               <div className="flex items-start gap-3">
                                 <Badge>JUN 15</Badge>
@@ -197,7 +197,7 @@ export default function DashboardPage() {
                          <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2"><Users /> Talk to a Mentor</CardTitle>
-                            </Header>
+                            </CardHeader>
                             <CardContent>
                                 <p className="text-muted-foreground">Connect with industry professionals.</p>
                                 <Badge variant="outline" className="mt-2">Coming Soon</Badge>
@@ -209,3 +209,5 @@ export default function DashboardPage() {
         </div>
     );
 }
+
+    
