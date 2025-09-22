@@ -2,37 +2,43 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { CareerSuggestions } from "@/components/results/career-suggestions";
 import { CollegeRecommendations } from "@/components/results/college-recommendations";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Loader2 } from "lucide-react";
 
 export default function ResultsPage() {
   const router = useRouter();
+  const { user, loading } = useAuth();
   const { careerSuggestions, reset } = useResultsStore((state) => ({
     careerSuggestions: state.careerSuggestions,
     reset: state.reset,
   }));
 
   useEffect(() => {
+    if (!loading && !user) {
+      router.replace("/");
+    }
     // If there are no results, redirect to the quiz.
     // This prevents accessing the page directly.
-    if (!careerSuggestions) {
+    else if (!loading && user && !careerSuggestions) {
       router.replace("/quiz");
     }
-  }, [careerSuggestions, router]);
+  }, [careerSuggestions, router, user, loading]);
 
   const handleRetakeQuiz = () => {
     reset();
     router.push("/quiz");
   };
 
-  if (!careerSuggestions) {
+  if (loading || !user || !careerSuggestions) {
     // Render a loader or null while redirecting
     return (
       <div className="flex h-screen items-center justify-center">
-        <p>Loading results...</p>
+         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
