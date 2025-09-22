@@ -26,21 +26,21 @@ export function Header() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link href="/quiz" legacyBehavior={false} passHref>
+                <Link href="/quiz" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Assessment
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link href="/colleges" legacyBehavior={false} passHref>
+                <Link href="/colleges" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Colleges
                   </NavigationMenuLink>
-                </Link>
+                </Link>              
               </NavigationMenuItem>
                <NavigationMenuItem>
-                <Link href="/profile" legacyBehavior={false} passHref>
+                <Link href="/profile" legacyBehavior passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Profile
                   </NavigationMenuLink>
