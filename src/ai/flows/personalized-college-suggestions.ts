@@ -11,7 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const PersonalizedCollegeSuggestionsInputSchema = z.object({
+const PersonalizedCollegeSuggestionsInputSchema = z.object({
   suggestedCareers: z
     .array(z.string())
     .describe("A list of career paths suggested to the user."),
@@ -33,7 +33,7 @@ export type PersonalizedCollegeSuggestionsInput = z.infer<
   typeof PersonalizedCollegeSuggestionsInputSchema
 >;
 
-export const PersonalizedCollegeSuggestionsOutputSchema = z.object({
+const PersonalizedCollegeSuggestionsOutputSchema = z.object({
   recommendations: z.array(
     z.object({
       collegeName: z.string().describe('The full name of the recommended Indian government college.'),
