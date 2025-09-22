@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck, LogOut } from "lucide-react";
+import { FileText, Briefcase, Building, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck, LogOut, Search } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -31,6 +31,13 @@ import { TimelineTracker } from '@/components/dashboard/timeline-tracker';
 
 type CollegeRecommendation = PersonalizedCollegeSuggestionsOutput['recommendations'][0];
 
+const iconMap = {
+    FileText: FileText,
+    Briefcase: Briefcase,
+    Building: Building,
+    Search: Search,
+};
+
 export default function ProfilePage() {
     const [scores, setScores] = useState({
       distance: 50,
@@ -49,6 +56,7 @@ export default function ProfilePage() {
     const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
     const [savedColleges, setSavedColleges] = useState(store.savedColleges);
     const [user, setUser] = useState(store.user);
+    const [activityLog, setActivityLog] = useState(store.activityLog);
     
     const { toast } = useToast();
     const router = useRouter();
@@ -58,7 +66,8 @@ export default function ProfilePage() {
       setChosenCareer(store.chosenCareer);
       setSavedColleges(store.savedColleges);
       setUser(store.user);
-    }, [store.careerSuggestions, store.chosenCareer, store.savedColleges, store.user]);
+      setActivityLog(store.activityLog);
+    }, [store.careerSuggestions, store.chosenCareer, store.savedColleges, store.user, store.activityLog]);
     
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
       setScores(prev => ({ ...prev, [category]: value[0] }));
@@ -300,9 +309,19 @@ export default function ProfilePage() {
               <CardTitle>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-                <p className="flex items-center gap-2 text-sm text-muted-foreground"><FileText className="w-4 h-4" /> Took 'Interests' assessment</p>
-                <p className="flex items-center gap-2 text-sm text-muted-foreground"><Briefcase className="w-4 h-4" /> Viewed 'Software Engineer' career</p>
-                <p className="flex items-center gap-2 text-sm text-muted-foreground"><Building className="w-4 h-4" /> Explored 'IIT Bombay'</p>
+              {activityLog.length > 0 ? (
+                activityLog.map(activity => {
+                  const Icon = iconMap[activity.icon];
+                  return (
+                    <p key={activity.id} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Icon className="w-4 h-4" />
+                      {activity.description}
+                    </p>
+                  )
+                })
+              ) : (
+                <p className="text-sm text-muted-foreground text-center">No recent activity to show.</p>
+              )}
             </CardContent>
           </Card>
 

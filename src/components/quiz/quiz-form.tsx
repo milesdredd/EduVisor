@@ -51,7 +51,7 @@ export function QuizForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  const { setQuizAnswers, setCareerSuggestions, reset } = useResultsStore();
+  const { setQuizAnswers, setCareerSuggestions, reset, addActivity } = useResultsStore();
   const { toast } = useToast();
 
   const form = useForm<QuizFormValues>({
@@ -104,6 +104,7 @@ export function QuizForm() {
 
       if (suggestions && suggestions.suggestions.length > 0) {
         setCareerSuggestions(suggestions);
+        addActivity({ description: "Took the career assessment", icon: 'FileText' });
         router.push("/results");
       } else {
         throw new Error("Could not generate career suggestions.");
@@ -184,12 +185,8 @@ export function QuizForm() {
                     <Input
                       type={currentQuestion.type}
                       placeholder={currentQuestion.placeholder}
-                      value={field.value || ''}
+                      value={field.value as string || ''}
                       onChange={field.onChange}
-                      name={field.name}
-                      ref={field.ref}
-                      onBlur={field.onBlur}
-                      disabled={field.disabled}
                     />
                   )}
                 </FormControl>

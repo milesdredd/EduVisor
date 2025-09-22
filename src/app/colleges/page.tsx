@@ -44,6 +44,7 @@ export default function CollegesPage() {
   const store = useResultsStore();
   const [savedColleges, setSavedColleges] = useState(store.savedColleges);
   const { toast } = useToast();
+  const { addActivity } = useResultsStore();
 
   const [location, setLocation] = useState(store.quizAnswers?.location as string || "");
   const [distance, setDistance] = useState(500);
@@ -71,6 +72,7 @@ export default function CollegesPage() {
         sortBy: sortBy as "ranking" | "fees" | "distance",
       });
       setSearchResults(results);
+      addActivity({ description: `Searched for '${stream}' colleges`, icon: 'Search' });
     } catch (error) {
       console.error(error);
       toast({

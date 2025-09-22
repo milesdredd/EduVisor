@@ -1,3 +1,4 @@
+
 "use client";
 
 import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight } from "lucide-react";
@@ -134,7 +135,7 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
   const [isCollegesLoading, setIsCollegesLoading] = useState(false);
   const [collegeRecommendations, setCollegeRecommendations] = useState<CollegeRecommendationsOutput | null>(null);
   const { toast } = useToast();
-  const { chosenCareer, setChosenCareer } = useResultsStore();
+  const { chosenCareer, setChosenCareer, addActivity } = useResultsStore();
   const isCareerChosen = chosenCareer?.title === career?.title;
 
 
@@ -145,6 +146,7 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
             const careerTitle = decodeURIComponent(params.slug).split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             const details = await getCareerDetails({ career: careerTitle });
             setCareer(details);
+            addActivity({ description: `Viewed '${careerTitle}' career`, icon: 'Briefcase' });
         } catch (error) {
             console.error("Failed to fetch career details:", error);
             toast({
@@ -158,7 +160,7 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
     };
 
     fetchDetails();
-  }, [params.slug, toast]);
+  }, [params.slug, toast, addActivity]);
   
   const handleFetchRecommendations = async () => {
     if (!career) return;
