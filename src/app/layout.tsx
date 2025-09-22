@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/header';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'PathFinder',
+  title: 'EduVisor',
   description: 'Find your career path and the education to get you there.',
 };
 
