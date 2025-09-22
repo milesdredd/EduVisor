@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass } from "lucide-react";
+import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -121,60 +121,71 @@ export default function ProfilePage() {
                     <CardDescription>Weigh your priorities to find the college that's the perfect fit for you.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {Object.entries(scores).map(([key, value]) => (
-                         <div key={key} className="space-y-2">
-                            <div className="flex justify-between">
-                                <label className="capitalize text-sm font-medium">{key.replace(/([A-Z])/g, ' $1')}</label>
-                                <span className="text-sm font-bold text-primary">{value}</span>
-                            </div>
-                            <Slider
-                                defaultValue={[value]}
-                                max={100}
-                                step={1}
-                                onValueChange={(val) => handleScoreChange(key as keyof typeof scores, val)}
-                            />
-                        </div>
-                    ))}
-                    <Collapsible>
-                        <CollapsibleTrigger asChild>
-                            <Button variant="secondary" className="w-full">
-                                Calculate My Ideal College Fit Score
+                    {!careerSuggestions ? (
+                        <div className="text-center text-muted-foreground p-8 rounded-lg bg-muted flex flex-col items-center gap-4">
+                            <Lock className="w-8 h-8" />
+                            <p>You need to complete the career assessment before using the Fit Scorer.</p>
+                            <Button asChild>
+                                <Link href="/quiz">Take the Assessment</Link>
                             </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="mt-4 text-center">
-                            <p className="text-muted-foreground">Your Ideal College Fit Score is</p>
-                            <p className="text-6xl font-bold text-primary">{calculateFitScore()}%</p>
-                        </CollapsibleContent>
-                    </Collapsible>
-                    
-                    <Separator />
-
-                    <div>
-                        <Button onClick={handleFetchRecommendations} disabled={isLoading} className="w-full">
-                            {isLoading ? <Loader2 className="animate-spin" /> : <GraduationCap />}
-                            Get Personalized College Recommendations
-                        </Button>
-                    </div>
-
-                    {isLoading && (
-                        <div className="flex justify-center items-center p-4">
-                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
                         </div>
-                    )}
-                    
-                    {recommendations && recommendations.recommendations.length > 0 && (
-                        <div className="space-y-4 pt-4">
-                            <h3 className="text-xl font-semibold">Your Recommended Colleges</h3>
-                            {recommendations.recommendations.map((rec, index) => (
-                                <Alert key={index}>
-                                    <GraduationCap className="h-4 w-4" />
-                                    <AlertTitle>{rec.collegeName}</AlertTitle>
-                                    <AlertDescription>{rec.reason}</AlertDescription>
-                                </Alert>
+                    ) : (
+                        <>
+                            {Object.entries(scores).map(([key, value]) => (
+                                <div key={key} className="space-y-2">
+                                    <div className="flex justify-between">
+                                        <label className="capitalize text-sm font-medium">{key.replace(/([A-Z])/g, ' $1')}</label>
+                                        <span className="text-sm font-bold text-primary">{value}</span>
+                                    </div>
+                                    <Slider
+                                        defaultValue={[value]}
+                                        max={100}
+                                        step={1}
+                                        onValueChange={(val) => handleScoreChange(key as keyof typeof scores, val)}
+                                    />
+                                </div>
                             ))}
-                        </div>
-                    )}
+                            <Collapsible>
+                                <CollapsibleTrigger asChild>
+                                    <Button variant="secondary" className="w-full">
+                                        Calculate My Ideal College Fit Score
+                                    </Button>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="mt-4 text-center">
+                                    <p className="text-muted-foreground">Your Ideal College Fit Score is</p>
+                                    <p className="text-6xl font-bold text-primary">{calculateFitScore()}%</p>
+                                </CollapsibleContent>
+                            </Collapsible>
+                            
+                            <Separator />
 
+                            <div>
+                                <Button onClick={handleFetchRecommendations} disabled={isLoading} className="w-full">
+                                    {isLoading ? <Loader2 className="animate-spin" /> : <GraduationCap />}
+                                    Get Personalized College Recommendations
+                                </Button>
+                            </div>
+
+                            {isLoading && (
+                                <div className="flex justify-center items-center p-4">
+                                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                                </div>
+                            )}
+                            
+                            {recommendations && recommendations.recommendations.length > 0 && (
+                                <div className="space-y-4 pt-4">
+                                    <h3 className="text-xl font-semibold">Your Recommended Colleges</h3>
+                                    {recommendations.recommendations.map((rec, index) => (
+                                        <Alert key={index}>
+                                            <GraduationCap className="h-4 w-4" />
+                                            <AlertTitle>{rec.collegeName}</AlertTitle>
+                                            <AlertDescription>{rec.reason}</AlertDescription>
+                                        </Alert>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    )}
                 </CardContent>
             </Card>
 
