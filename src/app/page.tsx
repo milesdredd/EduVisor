@@ -1,28 +1,61 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BarChart2, Lightbulb, TrendingUp } from "lucide-react";
+import { ArrowRight, BarChart2, Lightbulb, TrendingUp, RefreshCw, LayoutDashboard } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useResultsStore } from "@/hooks/use-results-store";
+import { useRouter } from "next/navigation";
 
 export default function WelcomePage() {
+  const { chosenCareer, reset } = useResultsStore();
+  const router = useRouter();
+
+  const handleStartAgain = () => {
+    reset();
+    router.push('/quiz');
+  };
+
   return (
     <div className="flex flex-col">
       <section className="container mx-auto px-4 py-16 sm:py-20 md:py-28">
         <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
           <div className="space-y-6">
             <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Discover a Career That Aligns With You
+              {chosenCareer 
+                ? `Welcome Back! Let's Continue Your Journey.`
+                : `Discover a Career That Aligns With You`
+              }
             </h1>
             <p className="text-lg text-muted-foreground">
-              Take our comprehensive assessment to discover career paths that align with your unique strengths and interests. Your future starts now.
+              {chosenCareer
+                ? `You're on the path to becoming a ${chosenCareer.title}. Your dashboard is ready with personalized resources to guide you.`
+                : `Take our comprehensive assessment to discover career paths that align with your unique strengths and interests. Your future starts now.`
+              }
             </p>
             <div className="flex gap-4">
-              <Button asChild size="lg">
-                <Link href="/quiz">
-                  Take The Assessment
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+              {chosenCareer ? (
+                <>
+                  <Button asChild size="lg">
+                    <Link href="/dashboard">
+                      Go to Dashboard
+                      <LayoutDashboard className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  <Button onClick={handleStartAgain} size="lg" variant="outline">
+                    Start Again
+                    <RefreshCw className="ml-2 h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <Button asChild size="lg">
+                  <Link href="/quiz">
+                    Take The Assessment
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
           <div className="flex justify-center">
