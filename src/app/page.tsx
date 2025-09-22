@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,7 @@ export default function WelcomePage() {
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] flex items-center justify-center text-center">
         <Image
-            src="https://picsum.photos/seed/pathfinder-hero/1200/800"
+            src="/home_bg.jpeg"
             alt="An inspiring image of a person looking towards a horizon"
             fill
             className="object-cover"
