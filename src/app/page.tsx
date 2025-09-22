@@ -112,7 +112,7 @@ export default function WelcomePage() {
               <CardContent>
                 <p className="text-muted-foreground">Individuals with higher education often experience lower unemployment rates and greater job security.</p>
               </CardContent>
-            </card>
+            </Card>
           </div>
         </div>
       </section>
