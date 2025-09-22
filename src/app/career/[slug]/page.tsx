@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, Briefcase, DollarSign, PlusCircle, Search, Sparkles, TrendingUp, Loader2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2 } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -57,7 +57,7 @@ function CareerDetailSkeleton() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div>
-                            <h3 className="font-semibold flex items-center gap-2 mb-2"><DollarSign className="w-5 h-5" /> Potential Salary</h3>
+                            <h3 className="font-semibold flex items-center gap-2 mb-2"><Wallet className="w-5 h-5" /> Potential Salary</h3>
                             <Skeleton className="h-6 w-3/4" />
                         </div>
                          <div>
@@ -213,7 +213,7 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div>
-                        <h3 className="font-semibold flex items-center gap-2 mb-2"><DollarSign className="w-5 h-5" /> Potential Salary</h3>
+                        <h3 className="font-semibold flex items-center gap-2 mb-2"><Wallet className="w-5 h-5" /> Potential Salary</h3>
                         <p className="text-lg font-medium">{career.potentialSalary}</p>
                     </div>
                      <div>

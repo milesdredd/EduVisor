@@ -26,22 +26,32 @@ const CareerDetailsOutputSchema = z.object({
     .describe('A list of 4-5 essential technical and soft skills.'),
   potentialSalary: z
     .string()
-    .describe('The potential salary range for this career in India, specified in INR (e.g., "₹8,00,000 - ₹15,00,000 per year").'),
+    .describe(
+      'The potential salary range for this career in India, specified in INR (e.g., "₹8,00,000 - ₹15,00,000 per year").'
+    ),
   jobGrowth: z
     .string()
-    .describe('The projected job growth percentage, including a qualitative assessment (e.g., "15% (Faster than average)").'),
+    .describe(
+      'The projected job growth percentage, including a qualitative assessment (e.g., "15% (Faster than average)").'
+    ),
   entrepreneurialOptions: z
     .array(z.string())
     .describe('A list of 2-3 potential entrepreneurial options or freelance paths.'),
   scholarships: z
     .array(z.string())
-    .describe('A list of 3-4 real, relevant scholarships for this field available in India.'),
+    .describe(
+      'A list of 3-4 real, relevant scholarships for this field available in India.'
+    ),
   academicPathway: z
     .string()
-    .describe('A typical, summarized academic pathway for this career, starting from high school subjects.'),
+    .describe(
+      'A typical, summarized academic pathway for this career, starting from high school subjects.'
+    ),
   studyMaterials: z
     .array(z.object({title: z.string(), url: z.string()}))
-    .describe('A list of 2-3 freely accessible study materials (like articles, tutorials, or documentation) with their titles and URLs.'),
+    .describe(
+      'A list of 2-3 freely accessible study materials (like articles, tutorials, or documentation) with their titles and URLs.'
+    ),
 });
 export type CareerDetailsOutput = z.infer<typeof CareerDetailsOutputSchema>;
 
@@ -79,6 +89,13 @@ const careerDetailsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    
+    if (output?.potentialSalary) {
+      // Programmatically ensure the correct currency symbol is used.
+      // The model sometimes uses other symbols despite the prompt.
+      output.potentialSalary = output.potentialSalary.replace(/[$₱]/g, '₹');
+    }
+
     return output!;
   }
 );
