@@ -20,9 +20,10 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const PersonalizedCareerSuggestionsInputSchema = z.object({
-  interest: z.string().describe('The user\'s primary area of interest.'),
-  skills: z.array(z.string()).describe('A list of the user\'s skills.'),
-  personality: z.string().describe('The user\'s personality type (e.g., introverted, extroverted).'),
+  interest: z.string().describe("The user's primary area of interest."),
+  aptitude: z.string().describe("The user's aptitude for logical problems."),
+  skills: z.array(z.string()).describe("A list of the user's skills."),
+  personality: z.string().describe("The user's personality type (e.g., introverted, extroverted)."),
 });
 export type PersonalizedCareerSuggestionsInput = z.infer<typeof PersonalizedCareerSuggestionsInputSchema>;
 
@@ -45,10 +46,11 @@ const prompt = ai.definePrompt({
   name: 'personalizedCareerSuggestionsPrompt',
   input: {schema: PersonalizedCareerSuggestionsInputSchema},
   output: {schema: PersonalizedCareerSuggestionsOutputSchema},
-  prompt: `Based on the following quiz results, suggest a list of personalized career paths.  Provide a suitability score from 0-100. Keep the description to one short sentence.
+  prompt: `Based on the following quiz results, suggest a list of personalized career paths. Provide a suitability score from 0-100. Keep the description to one short sentence.
 
 Quiz Results:
 Interest: {{{interest}}}
+Aptitude: {{{aptitude}}}
 Skills: {{#each skills}}- {{{this}}}\n{{/each}}
 Personality: {{{personality}}}
 

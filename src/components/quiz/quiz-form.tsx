@@ -79,11 +79,9 @@ export function QuizForm() {
     setQuizAnswers(data);
 
     try {
-      // The AI flow currently only supports interest, skills, and personality.
-      // We will need to update it to include aptitude.
-      // For now, we omit it from the call.
       const suggestions = await personalizedCareerSuggestions({
         interest: data.interest as string,
+        aptitude: data.aptitude as string,
         skills: data.skills as string[],
         personality: data.personality as string,
       });
