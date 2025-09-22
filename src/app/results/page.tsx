@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { CareerSuggestions } from "@/components/results/career-suggestions";
-import { CollegeRecommendations } from "@/components/results/college-recommendations";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Loader2 } from "lucide-react";
@@ -48,10 +47,6 @@ export default function ResultsPage() {
       </div>
       
       <CareerSuggestions suggestions={careerSuggestions} />
-
-      <Separator />
-
-      <CollegeRecommendations />
 
       <Separator />
 
