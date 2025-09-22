@@ -60,14 +60,19 @@ export default function ProfilePage() {
     
     const { toast } = useToast();
     const router = useRouter();
+    const isLocked = !chosenCareer && !careerSuggestions;
+    const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
 
     useEffect(() => {
-      setCareerSuggestions(store.careerSuggestions);
-      setChosenCareer(store.chosenCareer);
-      setSavedColleges(store.savedColleges);
-      setUser(store.user);
-      setActivityLog(store.activityLog);
-    }, [store.careerSuggestions, store.chosenCareer, store.savedColleges, store.user, store.activityLog]);
+        const unsub = useResultsStore.subscribe((state) => {
+            setCareerSuggestions(state.careerSuggestions);
+            setChosenCareer(state.chosenCareer);
+            setSavedColleges(state.savedColleges);
+            setUser(state.user);
+            setActivityLog(state.activityLog);
+        });
+        return () => unsub();
+    }, []);
     
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
       setScores(prev => ({ ...prev, [category]: value[0] }));
@@ -302,7 +307,7 @@ export default function ProfilePage() {
             </Card>
         </div>
         <div className="space-y-8">
-          <TimelineTracker career={chosenCareer?.title} isLocked={!chosenCareer} />
+          <TimelineTracker career={timelineCareer} isLocked={isLocked} />
 
           <Card>
             <CardHeader>

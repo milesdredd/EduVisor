@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -38,10 +39,18 @@ function LockedDashboardOverlay() {
 export default function DashboardPage() {
     const store = useResultsStore();
     const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
+    const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
+    const isLocked = !chosenCareer && !careerSuggestions;
+    const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
+
 
     useEffect(() => {
-        setChosenCareer(store.chosenCareer);
-    }, [store.chosenCareer]);
+        const unsub = useResultsStore.subscribe((state) => {
+            setChosenCareer(state.chosenCareer);
+            setCareerSuggestions(state.careerSuggestions);
+        });
+        return () => unsub();
+    }, []);
 
     const [syllabusProgress, setSyllabusProgress] = useState<Record<string, boolean>>({
       syllabus1: false,
@@ -86,13 +95,16 @@ export default function DashboardPage() {
                     ) : (
                         <div className="text-center py-6">
                             <p className="text-muted-foreground">You haven't chosen a career path yet. Explore your results and choose a path to unlock your dashboard!</p>
+                             <Button asChild variant="default" className="mt-4">
+                                <Link href="/results">View My Results</Link>
+                            </Button>
                         </div>
                     )}
                 </CardContent>
             </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
-                {!chosenCareer && <LockedDashboardOverlay />}
+                {isLocked && <LockedDashboardOverlay />}
 
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-8">
@@ -107,15 +119,15 @@ export default function DashboardPage() {
                                     <div key={item.id} className="flex items-center">
                                         <Checkbox
                                             id={item.id}
-                                            checked={chosenCareer ? syllabusProgress[item.id] : false}
+                                            checked={!isLocked && syllabusProgress[item.id]}
                                             onCheckedChange={(checked) => handleSyllabusChange(item.id, checked)}
-                                            disabled={!chosenCareer}
+                                            disabled={isLocked}
                                             className="mr-3"
                                         />
                                         <label
                                             htmlFor={item.id}
                                             className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
-                                                syllabusProgress[item.id] && chosenCareer ? 'line-through text-muted-foreground' : ''
+                                                syllabusProgress[item.id] && !isLocked ? 'line-through text-muted-foreground' : ''
                                             }`}
                                         >
                                             {item.label}
@@ -136,7 +148,7 @@ export default function DashboardPage() {
                             <p>2. "Inspired: How to Create Tech Products Customers Love" by Marty Cagan</p>
                         </CardContent>
                          <CardFooter>
-                            <Button variant="secondary" disabled={!chosenCareer}>Explore More Resources</Button>
+                            <Button variant="secondary" disabled={isLocked}>Explore More Resources</Button>
                         </CardFooter>
                     </Card>
                     
@@ -160,14 +172,14 @@ export default function DashboardPage() {
                             <CardTitle>Overall Progress</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3 text-center">
-                            <Progress value={chosenCareer ? overallProgress : 0} />
+                            <Progress value={!isLocked ? overallProgress : 0} />
                             <p className="text-sm text-muted-foreground">
-                                {chosenCareer ? `You're ${overallProgress}% of the way there. Keep going!` : 'Complete the quiz to start your progress.'}
+                                {!isLocked ? `You're ${overallProgress}% of the way there. Keep going!` : 'Complete the quiz to start your progress.'}
                             </p>
                         </CardContent>
                     </Card>
 
-                    <TimelineTracker career={chosenCareer?.title} isLocked={!chosenCareer} />
+                    <TimelineTracker career={timelineCareer} isLocked={isLocked} />
 
                     <Card className="bg-secondary">
                          <CardHeader>
@@ -177,7 +189,7 @@ export default function DashboardPage() {
                             <p className="text-muted-foreground">Get a personalized timetable, find answers to complex questions, and more.</p>
                         </CardContent>
                         <CardFooter>
-                            <Button className="w-full" disabled={!chosenCareer}>
+                            <Button className="w-full" disabled={isLocked}>
                                 Create My Study Plan <ArrowRight className="ml-2"/>
                             </Button>
                         </CardFooter>
