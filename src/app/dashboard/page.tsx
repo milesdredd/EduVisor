@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useResultsStore } from '@/hooks/use-results-store';
 import Link from 'next/link';
@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Compass, BookOpen, Newspaper, CalendarDays, Target, Bot, Users, ArrowRight } from 'lucide-react';
+import { Compass, BookOpen, Newspaper, CalendarDays, Target, Bot, Users, ArrowRight, Lock } from 'lucide-react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 
 // Mock data for syllabus - in a real app, this might come from an API based on the chosen career
@@ -21,20 +21,27 @@ const MOCK_SYLLABUS = [
   { id: 'syllabus3', label: 'Fundamentals of Product Management' },
 ];
 
+function LockedDashboardOverlay() {
+    return (
+        <div className="absolute inset-0 z-10 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center text-center p-4">
+            <Lock className="w-16 h-16 text-primary mb-4" />
+            <h2 className="text-2xl font-bold font-headline mb-2">Unlock Your Dashboard</h2>
+            <p className="text-muted-foreground mb-6">Take the career assessment to get your personalized dashboard.</p>
+            <Button asChild>
+                <Link href="/quiz">Take the Assessment</Link>
+            </Button>
+        </div>
+    );
+}
+
+
 export default function DashboardPage() {
-    const router = useRouter();
-    const { chosenCareer, careerSuggestions } = useResultsStore();
+    const { chosenCareer } = useResultsStore();
     const [syllabusProgress, setSyllabusProgress] = useState<Record<string, boolean>>({
       syllabus1: false,
       syllabus2: false,
       syllabus3: false, 
     });
-
-    useEffect(() => {
-        if (!careerSuggestions) {
-            router.replace('/quiz');
-        }
-    }, [careerSuggestions, router]);
 
     const handleSyllabusChange = (id: string, checked: CheckedState) => {
         setSyllabusProgress(prev => ({ ...prev, [id]: !!checked }));
@@ -43,14 +50,6 @@ export default function DashboardPage() {
     const overallProgress = Math.round(
       (Object.values(syllabusProgress).filter(Boolean).length / MOCK_SYLLABUS.length) * 100
     );
-
-    if (!careerSuggestions) {
-        return (
-            <div className="flex h-screen items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-        );
-    }
     
     return (
         <div className="container mx-auto py-12 space-y-8">
@@ -79,133 +78,131 @@ export default function DashboardPage() {
                             </Button>
                         </div>
                     ) : (
-                        <div className="text-center py-6 space-y-4">
+                        <div className="text-center py-6">
                             <p className="text-muted-foreground">You haven't chosen a career path yet. Explore your results and choose a path to unlock your dashboard!</p>
-                            <Button asChild>
-                                <Link href="/results">Explore My Career Matches</Link>
-                            </Button>
                         </div>
                     )}
                 </CardContent>
             </Card>
 
-            {chosenCareer && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-8">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
-                                <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-3">
-                                    {MOCK_SYLLABUS.map(item => (
-                                        <div key={item.id} className="flex items-center">
-                                            <Checkbox
-                                                id={item.id}
-                                                checked={syllabusProgress[item.id]}
-                                                onCheckedChange={(checked) => handleSyllabusChange(item.id, checked)}
-                                                className="mr-3"
-                                            />
-                                            <label
-                                                htmlFor={item.id}
-                                                className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
-                                                    syllabusProgress[item.id] ? 'line-through text-muted-foreground' : ''
-                                                }`}
-                                            >
-                                                {item.label}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </CardContent>
-                        </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
+                {!chosenCareer && <LockedDashboardOverlay />}
 
-                         <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><BookOpen /> Top Resources</CardTitle>
-                                <CardDescription>Curated books and articles to get you started.</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                <p>1. "Cracking the PM Interview" by Gayle Laakmann McDowell</p>
-                                <p>2. "Inspired: How to Create Tech Products Customers Love" by Marty Cagan</p>
-                            </CardContent>
-                             <CardFooter>
-                                <Button variant="secondary">Explore More Resources</Button>
-                            </CardFooter>
-                        </Card>
-                        
-                         <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><Newspaper /> Latest News & Trends</CardTitle>
-                                <CardDescription>Stay updated with what's happening in the world of {chosenCareer.title}.</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                <p className="font-medium">AI's Impact on Product Management is Growing</p>
-                                <p className="text-sm text-muted-foreground">Product managers are increasingly leveraging AI tools for market analysis and feature prioritization...</p>
-                            </CardContent>
-                        </Card>
+                {/* Left Column */}
+                <div className="lg:col-span-2 space-y-8">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
+                            <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-3">
+                                {MOCK_SYLLABUS.map(item => (
+                                    <div key={item.id} className="flex items-center">
+                                        <Checkbox
+                                            id={item.id}
+                                            checked={chosenCareer ? syllabusProgress[item.id] : false}
+                                            onCheckedChange={(checked) => handleSyllabusChange(item.id, checked)}
+                                            disabled={!chosenCareer}
+                                            className="mr-3"
+                                        />
+                                        <label
+                                            htmlFor={item.id}
+                                            className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                                                syllabusProgress[item.id] && chosenCareer ? 'line-through text-muted-foreground' : ''
+                                            }`}
+                                        >
+                                            {item.label}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
 
-                    </div>
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><BookOpen /> Top Resources</CardTitle>
+                            <CardDescription>Curated books and articles to get you started.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p>1. "Cracking the PM Interview" by Gayle Laakmann McDowell</p>
+                            <p>2. "Inspired: How to Create Tech Products Customers Love" by Marty Cagan</p>
+                        </CardContent>
+                         <CardFooter>
+                            <Button variant="secondary" disabled={!chosenCareer}>Explore More Resources</Button>
+                        </CardFooter>
+                    </Card>
+                    
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Newspaper /> Latest News & Trends</CardTitle>
+                            <CardDescription>Stay updated with what's happening in the world of {chosenCareer ? chosenCareer.title : "your future career"}.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                            <p className="font-medium">AI's Impact on Product Management is Growing</p>
+                            <p className="text-sm text-muted-foreground">Product managers are increasingly leveraging AI tools for market analysis and feature prioritization...</p>
+                        </CardContent>
+                    </Card>
 
-                    {/* Right Column */}
-                    <div className="space-y-8">
-                         <Card>
-                            <CardHeader>
-                                <CardTitle>Overall Progress</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3 text-center">
-                                <Progress value={overallProgress} />
-                                <p className="text-sm text-muted-foreground">
-                                    You're {overallProgress}% of the way there. Keep going!
-                                </p>
-                            </CardContent>
-                        </Card>
-
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><CalendarDays /> Timeline Tracker</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                              <div className="flex items-start gap-3">
-                                <Badge>JUN 15</Badge>
-                                <p className="text-sm">JEE Advanced Application Deadline</p>
-                              </div>
-                              <Separator />
-                               <div className="flex items-start gap-3">
-                                <Badge>JUL 01</Badge>
-                                <p className="text-sm">VITEEE Counseling Starts</p>
-                              </div>
-                            </CardContent>
-                        </Card>
-
-                        <Card className="bg-secondary">
-                             <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><Bot /> AI Study Helper</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground">Get a personalized timetable, find answers to complex questions, and more.</p>
-                            </CardContent>
-                            <CardFooter>
-                                <Button className="w-full">
-                                    Create My Study Plan <ArrowRight className="ml-2"/>
-                                </Button>
-                            </CardFooter>
-                        </Card>
-
-                         <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><Users /> Talk to a Mentor</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground">Connect with industry professionals.</p>
-                                <Badge variant="outline" className="mt-2">Coming Soon</Badge>
-                            </CardContent>
-                        </Card>
-                    </div>
                 </div>
-            )}
+
+                {/* Right Column */}
+                <div className="space-y-8">
+                     <Card>
+                        <CardHeader>
+                            <CardTitle>Overall Progress</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3 text-center">
+                            <Progress value={chosenCareer ? overallProgress : 0} />
+                            <p className="text-sm text-muted-foreground">
+                                {chosenCareer ? `You're ${overallProgress}% of the way there. Keep going!` : 'Complete the quiz to start your progress.'}
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><CalendarDays /> Timeline Tracker</CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div className="flex items-start gap-3">
+                            <Badge>JUN 15</Badge>
+                            <p className="text-sm">JEE Advanced Application Deadline</p>
+                          </div>
+                          <Separator />
+                           <div className="flex items-start gap-3">
+                            <Badge>JUL 01</Badge>
+                            <p className="text-sm">VITEEE Counseling Starts</p>
+                          </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-secondary">
+                         <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Bot /> AI Study Helper</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground">Get a personalized timetable, find answers to complex questions, and more.</p>
+                        </CardContent>
+                        <CardFooter>
+                            <Button className="w-full" disabled={!chosenCareer}>
+                                Create My Study Plan <ArrowRight className="ml-2"/>
+                            </Button>
+                        </CardFooter>
+                    </Card>
+
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2"><Users /> Talk to a Mentor</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="text-muted-foreground">Connect with industry professionals.</p>
+                            <Badge variant="outline" className="mt-2">Coming Soon</Badge>
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
         </div>
     );
 }
