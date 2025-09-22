@@ -89,13 +89,6 @@ const careerDetailsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    
-    if (output?.potentialSalary) {
-      // Programmatically ensure the correct currency symbol is used.
-      // The model sometimes uses other symbols despite the prompt.
-      output.potentialSalary = output.potentialSalary.replace(/[$₱]/g, '₹');
-    }
-
     return output!;
   }
 );
