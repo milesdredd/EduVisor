@@ -62,7 +62,7 @@ Provide real, specific examples for all fields. Format URLs as valid links.
 
 - jobDuties: List 3-4 primary responsibilities.
 - requiredSkills: List 4-5 key technical and soft skills.
-- potentialSalary: Provide a realistic salary range in INR.
+- potentialSalary: Provide a realistic salary range in INR. Use the format "₹8,00,000 - ₹15,00,000 per year".
 - jobGrowth: State the projected growth rate.
 - entrepreneurialOptions: Suggest 2-3 freelance or business ideas.
 - scholarships: Name 3-4 actual scholarships available in India.
