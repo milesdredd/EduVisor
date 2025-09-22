@@ -40,7 +40,8 @@ const prompt = ai.definePrompt({
   input: {schema: CollegeRecommendationsInputSchema},
   output: {schema: CollegeRecommendationsOutputSchema},
   prompt: `Based on the following suggested careers: {{suggestedCareers}},
-  recommend a list of potential colleges and educational tracks.`,
+  recommend a list of potential Indian government colleges and their relevant educational tracks.
+  Focus exclusively on government colleges within India.`,
 });
 
 const collegeRecommendationsFlow = ai.defineFlow(
