@@ -130,13 +130,12 @@ export function QuizForm() {
                       {currentQuestion.options.map((option) => {
                         const inputId = `${currentQuestion.id}-${option.replace(/\s+/g, '-')}`;
                         return (
-                        <FormItem key={option} className="flex items-center space-x-3 space-y-0 rounded-md border p-4 transition-all hover:bg-accent/50 has-[[data-state=checked]]:bg-accent has-[[data-state=checked]]:text-accent-foreground">
-                          <FormControl>
+                          <div key={option} className="flex items-center">
                             <RadioGroupItem value={option} id={inputId} />
-                          </FormControl>
-                          <Label htmlFor={inputId} className="font-normal w-full">{option}</Label>
-                        </FormItem>
-                      )})}
+                            <Label htmlFor={inputId} className="ml-3 block w-full cursor-pointer rounded-md border p-4 font-normal transition-all hover:bg-accent/50 has-[:checked]:bg-accent has-[:checked]:text-accent-foreground">{option}</Label>
+                          </div>
+                        )
+                      })}
                     </RadioGroup>
                   ) : (
                     <div className="space-y-2">
@@ -145,26 +144,24 @@ export function QuizForm() {
                         const skillsValue = (form.watch('skills') as string[]) || [];
                         const skillsCount = skillsValue.length;
                         return (
-                          <FormItem key={option} className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 transition-all hover:bg-accent/50 has-[[data-state=checked]]:bg-accent has-[[data-state=checked]]:text-accent-foreground">
-                            <FormControl>
-                              <Checkbox
-                                id={inputId}
-                                checked={skillsValue.includes(option)}
-                                disabled={skillsCount >= 3 && !skillsValue.includes(option)}
-                                onCheckedChange={(checked) => {
-                                  const currentValue = skillsValue;
-                                  if (checked) {
-                                      if (currentValue.length < 3) {
-                                          field.onChange([...currentValue, option]);
-                                      }
-                                  } else {
-                                      field.onChange(currentValue.filter(value => value !== option));
-                                  }
-                                }}
-                              />
-                            </FormControl>
-                            <Label htmlFor={inputId} className="font-normal w-full">{option}</Label>
-                          </FormItem>
+                          <div key={option} className="flex items-center">
+                            <Checkbox
+                              id={inputId}
+                              checked={skillsValue.includes(option)}
+                              disabled={skillsCount >= 3 && !skillsValue.includes(option)}
+                              onCheckedChange={(checked) => {
+                                const currentValue = skillsValue;
+                                if (checked) {
+                                    if (currentValue.length < 3) {
+                                        field.onChange([...currentValue, option]);
+                                    }
+                                } else {
+                                    field.onChange(currentValue.filter(value => value !== option));
+                                }
+                              }}
+                            />
+                            <Label htmlFor={inputId} className="ml-3 block w-full cursor-pointer rounded-md border p-4 font-normal transition-all hover:bg-accent/50 has-[:checked]:bg-accent has-[:checked]:text-accent-foreground">{option}</Label>
+                          </div>
                         );
                       })}
                     </div>
