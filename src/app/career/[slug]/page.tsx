@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart } from "lucide-react";
+import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -184,7 +184,7 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
       setChosenCareer(career);
       toast({
         title: "Path Chosen!",
-        description: `You've selected '${career.title}' as your career path.`,
+        description: `'${career.title}' is now your official career path. Your journey starts now!`,
       });
     }
   };
@@ -230,34 +230,45 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
       <div className="space-y-10">
         <Card>
             <CardHeader>
-              <div className="flex justify-between items-start">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                   <div>
                     <CardTitle className="text-4xl font-headline">{career.title}</CardTitle>
                     <CardDescription>
                         A comprehensive look at the career path of a {career.title}.
                     </CardDescription>
                   </div>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                       <Button disabled={isCareerChosen} variant={isCareerChosen ? "secondary" : "default"}>
-                        {isCareerChosen ? <CheckCircle className="mr-2" /> : <Heart className="mr-2" />}
-                         {isCareerChosen ? "Path Chosen" : "Choose This Career Path"}
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you ready to commit to this path?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                           <p className="italic text-center my-4">"The future depends on what you do today." - Mahatma Gandhi</p>
-                           This action will set '{career.title}' as your chosen career path. You can always explore and change your path later. 😉
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleChooseCareer}>I Agree</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                  {isCareerChosen ? (
+                      <div className="text-center">
+                        <Button asChild>
+                            <Link href="/dashboard">
+                                Let's Go to the Dashboard <ArrowRight className="ml-2" />
+                            </Link>
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-2 italic">"Your career, my responsibility."</p>
+                      </div>
+                  ) : (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button>
+                          <Heart className="mr-2" />
+                          Choose This Career Path
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you ready to commit to this path?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            <p className="italic text-center my-4">"The future depends on what you do today." - Mahatma Gandhi</p>
+                            This action will set '{career.title}' as your chosen career path. You can always explore and change your path later. 😉
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={handleChooseCareer}>I Agree</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
               </div>
             </CardHeader>
         </Card>
