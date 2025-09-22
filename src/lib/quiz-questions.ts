@@ -19,6 +19,17 @@ export const quizQuestions: QuizQuestion[] = [
     ],
   },
   {
+    id: 'aptitude',
+    type: 'radio',
+    question: 'You are faced with a complex logical puzzle. How do you feel?',
+    options: [
+        'Excited and ready to solve it systematically.',
+        'A bit intimidated, but willing to try.',
+        'Prefer to work on something more creative.',
+        'I would rather ask for help or collaborate.',
+    ],
+  },
+  {
     id: 'skills',
     type: 'checkbox',
     question: 'Which of these skills do you enjoy using or want to develop? (Select up to 3)',

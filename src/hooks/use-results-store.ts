@@ -23,9 +23,9 @@ export const useResultsStore = create<ResultsState>()(
   persist(
     (set) => ({
       ...initialState,
-      setQuizAnswers: (answers) => set({ quizAnswers: answers }),
-      setCareerSuggestions: (suggestions) => set({ careerSuggestions: suggestions }),
-      setCollegeRecommendations: (recommendations) => set({ collegeRecommendations: recommendations }),
+      setQuizAnswers: (answers) => set((state) => ({ ...state, quizAnswers: answers })),
+      setCareerSuggestions: (suggestions) => set((state) => ({ ...state, careerSuggestions: suggestions })),
+      setCollegeRecommendations: (recommendations) => set((state) => ({ ...state, collegeRecommendations: recommendations })),
       reset: () => set(initialState),
     }),
     {

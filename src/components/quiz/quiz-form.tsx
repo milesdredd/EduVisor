@@ -52,6 +52,7 @@ export function QuizForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       interest: '',
+      aptitude: '',
       skills: [],
       personality: ''
     },
@@ -78,6 +79,9 @@ export function QuizForm() {
     setQuizAnswers(data);
 
     try {
+      // The AI flow currently only supports interest, skills, and personality.
+      // We will need to update it to include aptitude.
+      // For now, we omit it from the call.
       const suggestions = await personalizedCareerSuggestions({
         interest: data.interest as string,
         skills: data.skills as string[],
@@ -174,7 +178,7 @@ export function QuizForm() {
               </Button>
             ) : (
               <Button type="button" onClick={handleNext}>
-                Next <ArrowRight className="ml-2 h-4 w-4" />
+                Next <ArrowRight className="ml-2 h-4" />
               </Button>
             )}
           </div>
