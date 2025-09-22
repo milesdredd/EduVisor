@@ -5,10 +5,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks } from "lucide-react";
+import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2 } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
+import { useResultsStore } from '@/hooks/use-results-store';
+import { getPersonalizedCollegeSuggestions, PersonalizedCollegeSuggestionsOutput } from '@/ai/flows/personalized-college-suggestions';
+import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function ProfilePage() {
     const [scores, setScores] = useState({
@@ -21,6 +25,11 @@ export default function ProfilePage() {
       accessibility: 75,
     });
     
+    const [isLoading, setIsLoading] = useState(false);
+    const [recommendations, setRecommendations] = useState<PersonalizedCollegeSuggestionsOutput | null>(null);
+    const { careerSuggestions } = useResultsStore();
+    const { toast } = useToast();
+    
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
       setScores(prev => ({ ...prev, [category]: value[0] }));
     };
@@ -29,6 +38,37 @@ export default function ProfilePage() {
         const total = Object.values(scores).reduce((sum, score) => sum + score, 0);
         return Math.round(total / Object.keys(scores).length);
     }
+
+    const handleFetchRecommendations = async () => {
+        if (!careerSuggestions || careerSuggestions.suggestions.length === 0) {
+            toast({
+                variant: "destructive",
+                title: "Quiz Not Taken",
+                description: "Please take the career assessment quiz first to get college recommendations.",
+            });
+            return;
+        }
+
+        setIsLoading(true);
+        setRecommendations(null);
+
+        try {
+            const result = await getPersonalizedCollegeSuggestions({
+                suggestedCareers: careerSuggestions.suggestions.map(s => s.career),
+                fitScorerPreferences: scores
+            });
+            setRecommendations(result);
+        } catch (error) {
+            console.error("Failed to get recommendations:", error);
+            toast({
+                variant: "destructive",
+                title: "An error occurred",
+                description: "Could not fetch college recommendations. Please try again.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
   
   return (
     <div className="container mx-auto py-12 space-y-12">
@@ -68,7 +108,7 @@ export default function ProfilePage() {
                     <Collapsible>
                         <CollapsibleTrigger asChild>
                             <Button variant="secondary" className="w-full">
-                                Calculate My College Fit Score
+                                Calculate My Ideal College Fit Score
                             </Button>
                         </CollapsibleTrigger>
                         <CollapsibleContent className="mt-4 text-center">
@@ -76,6 +116,35 @@ export default function ProfilePage() {
                             <p className="text-6xl font-bold text-primary">{calculateFitScore()}%</p>
                         </CollapsibleContent>
                     </Collapsible>
+                    
+                    <Separator />
+
+                    <div>
+                        <Button onClick={handleFetchRecommendations} disabled={isLoading} className="w-full">
+                            {isLoading ? <Loader2 className="animate-spin" /> : <GraduationCap />}
+                            Get Personalized College Recommendations
+                        </Button>
+                    </div>
+
+                    {isLoading && (
+                        <div className="flex justify-center items-center p-4">
+                            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                        </div>
+                    )}
+                    
+                    {recommendations && recommendations.recommendations.length > 0 && (
+                        <div className="space-y-4 pt-4">
+                            <h3 className="text-xl font-semibold">Your Recommended Colleges</h3>
+                            {recommendations.recommendations.map((rec, index) => (
+                                <Alert key={index}>
+                                    <GraduationCap className="h-4 w-4" />
+                                    <AlertTitle>{rec.collegeName}</AlertTitle>
+                                    <AlertDescription>{rec.reason}</AlertDescription>
+                                </Alert>
+                            ))}
+                        </div>
+                    )}
+
                 </CardContent>
             </Card>
 
