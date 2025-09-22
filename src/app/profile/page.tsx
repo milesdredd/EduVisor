@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2 } from "lucide-react";
+import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -40,7 +40,7 @@ export default function ProfilePage() {
     
     const [isLoading, setIsLoading] = useState(false);
     const [recommendations, setRecommendations] = useState<PersonalizedCollegeSuggestionsOutput | null>(null);
-    const { careerSuggestions, chosenCareer, reset } = useResultsStore();
+    const { careerSuggestions, chosenCareer, reset, savedColleges, addSavedCollege } = useResultsStore();
     const { toast } = useToast();
     const router = useRouter();
     
@@ -91,6 +91,14 @@ export default function ProfilePage() {
         description: "Your assessment data has been reset. You can now take the quiz again.",
       });
       router.push('/quiz');
+    };
+
+    const handleSaveCollege = (rec: { collegeName: string; reason: string; }) => {
+        addSavedCollege(rec);
+        toast({
+            title: "College Saved!",
+            description: `${rec.collegeName} has been added to your list.`,
+        });
     };
   
   return (
@@ -197,13 +205,29 @@ export default function ProfilePage() {
                             {recommendations && recommendations.recommendations.length > 0 && (
                                 <div className="space-y-4 pt-4">
                                     <h3 className="text-xl font-semibold">Your Recommended Colleges</h3>
-                                    {recommendations.recommendations.map((rec, index) => (
-                                        <Alert key={index}>
-                                            <GraduationCap className="h-4 w-4" />
-                                            <AlertTitle>{rec.collegeName}</AlertTitle>
-                                            <AlertDescription>{rec.reason}</AlertDescription>
-                                        </Alert>
-                                    ))}
+                                    {recommendations.recommendations.map((rec, index) => {
+                                        const isSaved = savedColleges.some(c => c.collegeName === rec.collegeName);
+                                        return (
+                                            <Alert key={index}>
+                                                <div className="flex items-start justify-between">
+                                                    <div>
+                                                        <GraduationCap className="h-4 w-4" />
+                                                        <AlertTitle>{rec.collegeName}</AlertTitle>
+                                                        <AlertDescription>{rec.reason}</AlertDescription>
+                                                    </div>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => handleSaveCollege(rec)}
+                                                        disabled={isSaved}
+                                                    >
+                                                        {isSaved ? <BookmarkCheck className="text-primary" /> : <Bookmark />}
+                                                        <span className="sr-only">Save College</span>
+                                                    </Button>
+                                                </div>
+                                            </Alert>
+                                        )
+                                    })}
                                 </div>
                             )}
                         </>
