@@ -158,6 +158,8 @@ export default function DashboardPage() {
       ? Math.round((Object.values(syllabusProgress).filter(Boolean).length / details.syllabus.length) * 100)
       : 0;
     
+    const showDashboardContent = chosenCareer && !isLoadingDetails;
+    
     return (
         <div className="container mx-auto py-12 space-y-8">
 
@@ -208,7 +210,7 @@ export default function DashboardPage() {
                                 <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {details?.syllabus ? (
+                                {showDashboardContent && details?.syllabus?.length ? (
                                     <div className="space-y-3">
                                         {details.syllabus.map(item => (
                                             <div key={item.id} className="flex items-center">
@@ -231,7 +233,9 @@ export default function DashboardPage() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-sm text-muted-foreground">No syllabus available yet. Choose a career to get started.</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        {chosenCareer ? 'No syllabus available for this career path yet.' : 'Choose a career to get started.'}
+                                    </p>
                                 )}
                             </CardContent>
                         </Card>
@@ -242,17 +246,23 @@ export default function DashboardPage() {
                                 <CardDescription>Curated books and articles to get you started.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                {details?.resources?.map((res, index) => (
-                                    <div key={index} className="flex items-start gap-3">
-                                        <div className="bg-secondary p-2 rounded-full">
-                                           <BookOpen className="w-4 h-4 text-secondary-foreground"/>
+                                {showDashboardContent && details?.resources?.length ? (
+                                    details.resources.map((res, index) => (
+                                        <div key={index} className="flex items-start gap-3">
+                                            <div className="bg-secondary p-2 rounded-full">
+                                               <BookOpen className="w-4 h-4 text-secondary-foreground"/>
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold">{res.title}</p>
+                                                <p className="text-xs text-muted-foreground capitalize">{res.type}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-semibold">{res.title}</p>
-                                            <p className="text-xs text-muted-foreground capitalize">{res.type}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))
+                                ) : (
+                                     <p className="text-sm text-muted-foreground">
+                                        {chosenCareer ? 'No resources available for this career path yet.' : 'Choose a career to get started.'}
+                                     </p>
+                                )}
                             </CardContent>
                             <CardFooter>
                                 <Button variant="secondary" disabled={isLocked}>Explore More Resources</Button>
@@ -265,12 +275,18 @@ export default function DashboardPage() {
                                 <CardDescription>Stay updated with what's happening in the world of {chosenCareer ? chosenCareer.title : "your future career"}.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {details?.news?.map((item, index) => (
-                                    <div key={index}>
-                                        <p className="font-medium">{item.headline}</p>
-                                        <p className="text-sm text-muted-foreground">{item.summary}</p>
-                                    </div>
-                                ))}
+                                {showDashboardContent && details?.news?.length ? (
+                                    details.news.map((item, index) => (
+                                        <div key={index}>
+                                            <p className="font-medium">{item.headline}</p>
+                                            <p className="text-sm text-muted-foreground">{item.summary}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                     <p className="text-sm text-muted-foreground">
+                                        {chosenCareer ? 'No news available for this career path yet.' : 'Choose a career to get started.'}
+                                     </p>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
