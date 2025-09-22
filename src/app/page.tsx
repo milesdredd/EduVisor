@@ -22,7 +22,7 @@ export default function WelcomePage() {
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] flex items-center justify-center text-center">
         <Image
-            src="/home_bg.jpeg"
+            src="/home/user/studio/icons/home_bg.jpeg"
             alt="An inspiring image of a person looking towards a horizon"
             fill
             className="object-cover"
