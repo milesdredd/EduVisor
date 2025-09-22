@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { CalendarDays, PlusCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { getTimelineEvents } from "@/ai/flows/timeline-tracker";
+import Link from 'next/link';
 import {
   Dialog,
   DialogContent,
@@ -45,7 +46,7 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
                 setIsLoading(true);
                 try {
                     const result = await getTimelineEvents({ career });
-                    const fetchedEvents = result.events.map((e, index) => ({ ...e, id: index }));
+                    const fetchedEvents = result.events.map((e, index) => ({ ...e, id: index, type: e.type as 'exam' | 'deadline' }));
                     setEvents(fetchedEvents);
                 } catch (error) {
                     console.error("Failed to fetch timeline events:", error);
@@ -60,11 +61,7 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
             };
             fetchEvents();
         } else {
-            // Set some placeholder events if no career is chosen
-            setEvents([
-                { id: 1, title: "JEE Advanced Application Deadline", date: "JUN 15", type: 'deadline' },
-                { id: 2, title: "VITEEE Counseling Starts", date: "JUL 01", type: 'exam' }
-            ]);
+            setEvents([]);
         }
     }, [career, toast]);
 
@@ -168,7 +165,12 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
                         </div>
                     ))
                 ) : (
-                    <p className="text-sm text-muted-foreground text-center">No upcoming events found. Add your own!</p>
+                    <div className="text-center text-muted-foreground p-4">
+                        <p>Nothing on your timeline yet.</p>
+                        <p className="text-sm">
+                            <Button variant="link" asChild className="p-0"><Link href="/quiz">Take the assessment</Link></Button> or add a custom event now.
+                        </p>
+                    </div>
                 )}
             </CardContent>
         </Card>
