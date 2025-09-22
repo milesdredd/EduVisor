@@ -45,7 +45,7 @@ export default function CollegesPage() {
   const [savedColleges, setSavedColleges] = useState(store.savedColleges);
   const { toast } = useToast();
 
-  const [location, setLocation] = useState(store.user?.location || "");
+  const [location, setLocation] = useState(store.quizAnswers?.location as string || "");
   const [distance, setDistance] = useState(500);
   const [stream, setStream] = useState("Computer Science");
   const [sortBy, setSortBy] = useState("ranking");
@@ -54,10 +54,10 @@ export default function CollegesPage() {
 
   useEffect(() => {
     setSavedColleges(store.savedColleges);
-    if (store.user?.location) {
-      setLocation(store.user.location);
+    if (store.quizAnswers?.location) {
+      setLocation(store.quizAnswers.location as string);
     }
-  }, [store.savedColleges, store.user]);
+  }, [store.savedColleges, store.quizAnswers]);
 
 
   const handleSearch = async () => {

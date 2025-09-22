@@ -30,7 +30,6 @@ const formSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters."),
   email: z.string().email("Please enter a valid email address."),
   password: z.string().min(8, "Password must be at least 8 characters."),
-  location: z.string().min(2, "Please enter your location."),
 });
 
 type LoginFormValues = z.infer<typeof formSchema>;
@@ -45,7 +44,6 @@ export default function LoginPage() {
       username: "",
       email: "",
       password: "",
-      location: "",
     },
   });
 
@@ -53,7 +51,6 @@ export default function LoginPage() {
     login({
         username: data.username,
         email: data.email,
-        location: data.location,
     });
     router.push("/");
   }
@@ -114,19 +111,6 @@ export default function LoginPage() {
                           <FormLabel>Password</FormLabel>
                           <FormControl>
                             <Input type="password" placeholder="********" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                     <FormField
-                      control={form.control}
-                      name="location"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Your Location (City, State)</FormLabel>
-                          <FormControl>
-                            <Input placeholder="e.g. Mumbai, Maharashtra" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

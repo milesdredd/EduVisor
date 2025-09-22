@@ -13,7 +13,6 @@ interface SavedCollege {
 interface UserData {
     username: string;
     email: string;
-    location: string;
 }
 
 interface ResultsState {
