@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -18,20 +19,22 @@ import {
 } from "firebase/auth";
 import { app } from "@/lib/firebase";
 
-// Initialize Auth outside of the component to ensure it's a singleton.
-const auth = getAuth(app);
-
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signUp: typeof createUserWithEmailAndPassword;
-  signIn: typeof signInWithEmailAndPassword;
+  auth: Auth;
+  signUp: (email:string, password:string) => Promise<any>;
+  signIn: (email:string, password:string) => Promise<any>;
   signOut: () => Promise<void>;
 }
+
+// Initialize Auth outside of the component to ensure it's a singleton.
+const auth = getAuth(app);
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  auth: auth,
   signUp: async () => { throw new Error('Not implemented') },
   signIn: async () => { throw new Error('Not implemented') },
   signOut: async () => { throw new Error('Not implemented') },
@@ -56,6 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     user,
     loading,
+    auth,
     signUp: (email, password) => createUserWithEmailAndPassword(auth, email, password),
     signIn: (email, password) => signInWithEmailAndPassword(auth, email, password),
     signOut: handleSignOut,
