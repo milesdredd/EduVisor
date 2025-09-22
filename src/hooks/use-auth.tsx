@@ -23,21 +23,23 @@ import { app } from "@/lib/firebase";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  auth: Auth | null;
-  db: Firestore | null;
-  signUp: (email:string, password:string) => Promise<any>;
-  signIn: (email:string, password:string) => Promise<any>;
+  signUp: (email: string, password: string) => Promise<any>;
+  signIn: (email: string, password: string) => Promise<any>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  auth: null,
-  db: null,
-  signUp: async () => { throw new Error('Auth not initialized') },
-  signIn: async () => { throw new Error('Auth not initialized') },
-  signOut: async () => { throw new Error('Auth not initialized') },
+  signUp: async () => {
+    throw new Error("Auth not initialized");
+  },
+  signIn: async () => {
+    throw new Error("Auth not initialized");
+  },
+  signOut: async () => {
+    throw new Error("Auth not initialized");
+  },
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -65,33 +67,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await signOut(auth);
     }
   };
-  
+
   const handleSignUp = async (email: string, password: string) => {
     if (!auth || !db) {
       throw new Error("Auth or DB not initialized");
     }
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
     const user = userCredential.user;
-    
+
     // Create a new document in the 'users' collection with the user's uid
     await setDoc(doc(db, "users", user.uid), {
       email: user.email,
       createdAt: new Date(),
     });
-    
+
     return userCredential;
   };
+  
+  const handleSignIn = async (email: string, password: string) => {
+    if (!auth) {
+      throw new Error("Auth not initialized");
+    }
+    return signInWithEmailAndPassword(auth, email, password);
+  }
 
   const value = {
     user,
     loading,
-    auth,
-    db,
     signUp: handleSignUp,
-    signIn: (email, password) => {
-      if (!auth) return Promise.reject(new Error("Auth not initialized"));
-      return signInWithEmailAndPassword(auth, email, password);
-    },
+    signIn: handleSignIn,
     signOut: handleSignOut,
   };
 

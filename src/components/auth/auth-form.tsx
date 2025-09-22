@@ -71,10 +71,34 @@ export function AuthForm({ type, onToggle }: AuthFormProps) {
       }
       router.push('/welcome');
     } catch (error: any) {
+        let errorMessage = "An unexpected error occurred. Please try again.";
+        // Firebase auth errors have a 'code' property.
+        if (error.code) {
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    errorMessage = "No account found with this email. Please sign up.";
+                    break;
+                case 'auth/wrong-password':
+                    errorMessage = "Incorrect password. Please try again.";
+                    break;
+                case 'auth/email-already-in-use':
+                    errorMessage = "An account with this email already exists. Please sign in.";
+                    break;
+                case 'auth/weak-password':
+                    errorMessage = "The password is too weak. Please choose a stronger password.";
+                    break;
+                case 'auth/invalid-email':
+                    errorMessage = "The email address is not valid.";
+                    break;
+                default:
+                    errorMessage = error.message;
+                    break;
+            }
+        }
       toast({
         variant: "destructive",
         title: "Authentication Failed",
-        description: error.message || "An unexpected error occurred. Please try again.",
+        description: errorMessage,
       });
     } finally {
       setIsLoading(false);
