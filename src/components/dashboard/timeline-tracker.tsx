@@ -99,7 +99,7 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
                     </div>
                      <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon" disabled={isLocked}>
+                            <Button variant="ghost" size="icon">
                                 <PlusCircle className="w-5 h-5" />
                             </Button>
                         </DialogTrigger>
