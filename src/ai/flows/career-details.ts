@@ -89,6 +89,12 @@ const careerDetailsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
+    
+    if (output) {
+      // Force replacement of any non-INR currency symbol to guarantee correctness.
+      output.potentialSalary = output.potentialSalary.replace(/₱|\$|€|£/g, '₹');
+    }
+
     return output!;
   }
 );
