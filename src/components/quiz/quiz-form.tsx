@@ -127,24 +127,28 @@ export function QuizForm() {
                       defaultValue={field.value as string}
                       className="space-y-2"
                     >
-                      {currentQuestion.options.map((option) => (
+                      {currentQuestion.options.map((option) => {
+                        const inputId = `${currentQuestion.id}-${option.replace(/\s+/g, '-')}`;
+                        return (
                         <FormItem key={option} className="flex items-center space-x-3 space-y-0 rounded-md border p-4 transition-all hover:bg-accent/50 has-[[data-state=checked]]:bg-accent has-[[data-state=checked]]:text-accent-foreground">
                           <FormControl>
-                            <RadioGroupItem value={option} />
+                            <RadioGroupItem value={option} id={inputId} />
                           </FormControl>
-                          <FormLabel className="font-normal">{option}</FormLabel>
+                          <Label htmlFor={inputId} className="font-normal w-full">{option}</Label>
                         </FormItem>
-                      ))}
+                      )})}
                     </RadioGroup>
                   ) : (
                     <div className="space-y-2">
                       {(currentQuestion.options || []).map((option) => {
+                        const inputId = `${currentQuestion.id}-${option.replace(/\s+/g, '-')}`;
                         const skillsValue = (form.watch('skills') as string[]) || [];
                         const skillsCount = skillsValue.length;
                         return (
                           <FormItem key={option} className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 transition-all hover:bg-accent/50 has-[[data-state=checked]]:bg-accent has-[[data-state=checked]]:text-accent-foreground">
                             <FormControl>
                               <Checkbox
+                                id={inputId}
                                 checked={skillsValue.includes(option)}
                                 disabled={skillsCount >= 3 && !skillsValue.includes(option)}
                                 onCheckedChange={(checked) => {
@@ -159,7 +163,7 @@ export function QuizForm() {
                                 }}
                               />
                             </FormControl>
-                            <FormLabel className="font-normal">{option}</FormLabel>
+                            <Label htmlFor={inputId} className="font-normal w-full">{option}</Label>
                           </FormItem>
                         );
                       })}
