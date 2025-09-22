@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   "projectId": "studio-7321343101-71473",
@@ -20,5 +21,6 @@ if (getApps().length === 0) {
 }
 
 const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+const db = getFirestore(app);
 
-export { app, analytics };
+export { app, analytics, db };
