@@ -184,7 +184,7 @@ export function QuizForm() {
                       {...field}
                       type={currentQuestion.type}
                       placeholder={currentQuestion.placeholder}
-                      value={field.value as string || ''}
+                      value={field.value || ''}
                     />
                   )}
                 </FormControl>
