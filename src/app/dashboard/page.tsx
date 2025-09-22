@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useResultsStore } from '@/hooks/use-results-store';
 import Link from 'next/link';
@@ -11,16 +12,37 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Compass, BookOpen, Newspaper, CalendarDays, Target, Bot, Users, ArrowRight } from 'lucide-react';
+import type { CheckedState } from '@radix-ui/react-checkbox';
+
+// Mock data for syllabus - in a real app, this might come from an API based on the chosen career
+const MOCK_SYLLABUS = [
+  { id: 'syllabus1', label: 'Data Structures & Algorithms' },
+  { id: 'syllabus2', label: 'System Design Principles' },
+  { id: 'syllabus3', label: 'Fundamentals of Product Management' },
+];
 
 export default function DashboardPage() {
     const router = useRouter();
     const { chosenCareer, careerSuggestions } = useResultsStore();
+    const [syllabusProgress, setSyllabusProgress] = useState<Record<string, boolean>>({
+      syllabus1: false,
+      syllabus2: false,
+      syllabus3: false, 
+    });
 
     useEffect(() => {
         if (!careerSuggestions) {
             router.replace('/quiz');
         }
     }, [careerSuggestions, router]);
+
+    const handleSyllabusChange = (id: string, checked: CheckedState) => {
+        setSyllabusProgress(prev => ({ ...prev, [id]: !!checked }));
+    };
+
+    const overallProgress = Math.round(
+      (Object.values(syllabusProgress).filter(Boolean).length / MOCK_SYLLABUS.length) * 100
+    );
 
     if (!careerSuggestions) {
         return (
@@ -78,18 +100,24 @@ export default function DashboardPage() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-3">
-                                    <div className="flex items-center">
-                                        <Checkbox id="syllabus1" className="mr-3" />
-                                        <label htmlFor="syllabus1" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Data Structures & Algorithms</label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <Checkbox id="syllabus2" className="mr-3" />
-                                        <label htmlFor="syllabus2" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">System Design Principles</label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <Checkbox id="syllabus3" className="mr-3" checked />
-                                        <label htmlFor="syllabus3" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 line-through text-muted-foreground">Fundamentals of Product Management</label>
-                                    </div>
+                                    {MOCK_SYLLABUS.map(item => (
+                                        <div key={item.id} className="flex items-center">
+                                            <Checkbox
+                                                id={item.id}
+                                                checked={syllabusProgress[item.id]}
+                                                onCheckedChange={(checked) => handleSyllabusChange(item.id, checked)}
+                                                className="mr-3"
+                                            />
+                                            <label
+                                                htmlFor={item.id}
+                                                className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                                                    syllabusProgress[item.id] ? 'line-through text-muted-foreground' : ''
+                                                }`}
+                                            >
+                                                {item.label}
+                                            </label>
+                                        </div>
+                                    ))}
                                 </div>
                             </CardContent>
                         </Card>
@@ -128,15 +156,17 @@ export default function DashboardPage() {
                                 <CardTitle>Overall Progress</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-3 text-center">
-                                <Progress value={25} />
-                                <p className="text-sm text-muted-foreground">You're 25% of the way there. Keep going!</p>
+                                <Progress value={overallProgress} />
+                                <p className="text-sm text-muted-foreground">
+                                    You're {overallProgress}% of the way there. Keep going!
+                                </p>
                             </CardContent>
                         </Card>
 
                         <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2"><CalendarDays /> Timeline Tracker</CardTitle>
-                            </CardHeader>
+                            </Header>
                             <CardContent className="space-y-4">
                               <div className="flex items-start gap-3">
                                 <Badge>JUN 15</Badge>
