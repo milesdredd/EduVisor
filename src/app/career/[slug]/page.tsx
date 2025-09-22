@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight } from "lucide-react";
@@ -16,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import { getCareerDetails, type CareerDetailsOutput } from "@/ai/flows/career-details";
 import { getCollegeRecommendations, type CollegeRecommendationsOutput } from "@/ai/flows/college-recommendations";
 import { useEffect, useState } from "react";
+import { useParams } from 'next/navigation';
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useResultsStore } from "@/hooks/use-results-store";
@@ -129,14 +129,15 @@ function CareerDetailSkeleton() {
 }
 
 
-export default function CareerDetailPage({ params }: { params: { slug: string } }) {
+export default function CareerDetailPage() {
   const [career, setCareer] = useState<CareerDetailsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCollegesLoading, setIsCollegesLoading] = useState(false);
+  const [isCollegesLoading, setIsCollegesLoading] = useState(isCollegesLoading);
   const [collegeRecommendations, setCollegeRecommendations] = useState<CollegeRecommendationsOutput | null>(null);
   const { toast } = useToast();
   const { chosenCareer, setChosenCareer, addActivity } = useResultsStore();
   const isCareerChosen = chosenCareer?.title === career?.title;
+  const params = useParams<{ slug: string }>();
 
 
   useEffect(() => {
@@ -159,7 +160,9 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
         }
     };
 
-    fetchDetails();
+    if (params.slug) {
+        fetchDetails();
+    }
   }, [params.slug, toast, addActivity]);
   
   const handleFetchRecommendations = async () => {
