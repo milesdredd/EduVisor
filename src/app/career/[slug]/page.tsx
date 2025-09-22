@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -13,8 +13,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getCareerDetails, type CareerDetailsOutput } from "@/ai/flows/career-details";
+import { getCollegeRecommendations, type CollegeRecommendationsOutput } from "@/ai/flows/college-recommendations";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
+
 
 function CareerDetailSkeleton() {
     return (
@@ -116,6 +119,9 @@ function CareerDetailSkeleton() {
 export default function CareerDetailPage({ params }: { params: { slug: string } }) {
   const [career, setCareer] = useState<CareerDetailsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCollegesLoading, setIsCollegesLoading] = useState(false);
+  const [collegeRecommendations, setCollegeRecommendations] = useState<CollegeRecommendationsOutput | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -126,14 +132,37 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
             setCareer(details);
         } catch (error) {
             console.error("Failed to fetch career details:", error);
-            // Optionally, set some error state to show in the UI
+            toast({
+                variant: "destructive",
+                title: "An error occurred",
+                description: "Failed to load career details. Please try again later.",
+            });
         } finally {
             setIsLoading(false);
         }
     };
 
     fetchDetails();
-  }, [params.slug]);
+  }, [params.slug, toast]);
+  
+  const handleFetchRecommendations = async () => {
+    if (!career) return;
+    setIsCollegesLoading(true);
+    setCollegeRecommendations(null); 
+    try {
+      const recommendations = await getCollegeRecommendations({ suggestedCareers: [career.title] });
+      setCollegeRecommendations(recommendations);
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: "Failed to get college recommendations. Please try again.",
+      });
+    } finally {
+      setIsCollegesLoading(false);
+    }
+  };
 
 
   if (isLoading) {
@@ -249,11 +278,35 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
                         ))}
                     </ul>
                 </div>
-                 <Button>
-                    <Search className="mr-2 h-4 w-4" /> Explore Colleges for this Path
+                 <Button onClick={handleFetchRecommendations} disabled={isCollegesLoading}>
+                    {isCollegesLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
+                    Explore Colleges for this Path
                 </Button>
             </CardContent>
         </Card>
+
+        {isCollegesLoading && (
+            <div className="flex justify-center items-center p-8">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        )}
+
+        {collegeRecommendations && (
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <GraduationCap /> Suggested Colleges & Tracks
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul className="list-disc space-y-2 pl-5 text-muted-foreground">
+                    {collegeRecommendations.collegeRecommendations.map((rec, index) => (
+                        <li key={index}>{rec}</li>
+                    ))}
+                    </ul>
+                </CardContent>
+            </Card>
+        )}
 
         <Card className="bg-primary/10 border-primary/30">
             <CardHeader>
@@ -272,4 +325,5 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
       </div>
     </div>
   );
-}
+
+    
