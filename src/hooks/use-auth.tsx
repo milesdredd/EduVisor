@@ -14,9 +14,11 @@ import {
   signInWithEmailAndPassword,
   signOut,
   type User,
+  type Auth,
 } from "firebase/auth";
 import { app } from "@/lib/firebase";
 
+// Initialize Auth outside of the component to ensure it's a singleton.
 const auth = getAuth(app);
 
 interface AuthContextType {
