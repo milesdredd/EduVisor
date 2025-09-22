@@ -34,7 +34,7 @@ export function Header() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link href="/quiz" legacyBehavior passHref>
+                <Link href="/quiz" passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Assessment
                   </NavigationMenuLink>
@@ -42,7 +42,7 @@ export function Header() {
               </NavigationMenuItem>
               {isClient && careerSuggestions && (
                  <NavigationMenuItem>
-                  <Link href="/dashboard" legacyBehavior passHref>
+                  <Link href="/dashboard" passHref>
                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                       <LayoutDashboard className="mr-2" />
                       Dashboard
@@ -51,14 +51,14 @@ export function Header() {
                 </NavigationMenuItem>
               )}
               <NavigationMenuItem>
-                <Link href="/colleges" legacyBehavior passHref>
+                <Link href="/colleges" passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Colleges
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
                <NavigationMenuItem>
-                <Link href="/profile" legacyBehavior passHref>
+                <Link href="/profile" passHref>
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Profile
                   </NavigationMenuLink>
