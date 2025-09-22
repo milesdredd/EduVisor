@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -15,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -27,8 +29,12 @@ import {
 
 const createSchema = (questions: QuizQuestion[]) => {
   const schemaObject = questions.reduce((acc, q) => {
-    if (q.type === 'radio') {
-      acc[q.id] = z.string({ required_error: "Please select an option." });
+    if (q.type === 'radio' || q.type === 'text') {
+      acc[q.id] = z.string({ required_error: "Please fill out this field." }).min(1, "This field is required.");
+    } else if (q.type === 'number') {
+        acc[q.id] = z.string().refine(val => !isNaN(Number(val)) && Number(val) > 0, {
+          message: "Please enter a valid number.",
+        });
     } else if (q.type === 'checkbox') {
       acc[q.id] = z.array(z.string()).min(1, "Please select at least one skill.").max(3, "You can only select up to 3 skills.");
     }
@@ -51,6 +57,11 @@ export function QuizForm() {
   const form = useForm<QuizFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      gender: '',
+      age: '',
+      educationLevel: '',
+      location: '',
+      marks: '',
       interest: '',
       aptitude: '',
       skills: [],
@@ -80,6 +91,11 @@ export function QuizForm() {
 
     try {
       const suggestions = await personalizedCareerSuggestions({
+        gender: data.gender as string,
+        age: data.age as string,
+        educationLevel: data.educationLevel as string,
+        location: data.location as string,
+        marks: data.marks as string,
         interest: data.interest as string,
         aptitude: data.aptitude as string,
         skills: data.skills as string[],
@@ -125,7 +141,7 @@ export function QuizForm() {
                       defaultValue={field.value as string}
                       className="space-y-2"
                     >
-                      {currentQuestion.options.map((option) => {
+                      {currentQuestion.options!.map((option) => {
                         const inputId = `${currentQuestion.id}-${option.replace(/\s+/g, '-')}`;
                         return (
                           <div key={option} className="flex items-center">
@@ -135,7 +151,7 @@ export function QuizForm() {
                         )
                       })}
                     </RadioGroup>
-                  ) : (
+                  ) : currentQuestion.type === 'checkbox' ? (
                     <div className="space-y-2">
                       {(currentQuestion.options || []).map((option) => {
                         const inputId = `${currentQuestion.id}-${option.replace(/\s+/g, '-')}`;
@@ -163,6 +179,13 @@ export function QuizForm() {
                         );
                       })}
                     </div>
+                  ) : (
+                    <Input
+                      {...field}
+                      type={currentQuestion.type}
+                      placeholder={currentQuestion.placeholder}
+                      value={field.value as string || ''}
+                    />
                   )}
                 </FormControl>
                 <FormMessage />

@@ -1,11 +1,43 @@
+
 export type QuizQuestion = {
   id: string;
-  type: 'radio' | 'checkbox';
+  type: 'radio' | 'checkbox' | 'text' | 'number';
   question: string;
-  options: string[];
+  options?: string[];
+  placeholder?: string;
 };
 
 export const quizQuestions: QuizQuestion[] = [
+  {
+    id: 'gender',
+    type: 'radio',
+    question: 'What is your gender?',
+    options: ['Male', 'Female', 'Prefer not to say'],
+  },
+  {
+    id: 'age',
+    type: 'number',
+    question: 'What is your age?',
+    placeholder: 'e.g., 18',
+  },
+  {
+    id: 'educationLevel',
+    type: 'radio',
+    question: 'What is your current education level?',
+    options: ['Completed Class 10', 'Completed Class 12', 'Undergraduate', 'Graduate', 'Other'],
+  },
+  {
+    id: 'location',
+    type: 'text',
+    question: 'Which state do you live in?',
+    placeholder: 'e.g., Maharashtra',
+  },
+  {
+    id: 'marks',
+    type: 'number',
+    question: 'What were your overall marks in 12th grade (in %)?',
+    placeholder: 'e.g., 85',
+  },
   {
     id: 'interest',
     type: 'radio',
