@@ -37,13 +37,14 @@ interface ResultsState {
   setCollegeRecommendations: (recommendations: CollegeRecommendationsOutput) => void;
   setChosenCareer: (career: CareerDetailsOutput | null) => void;
   addSavedCollege: (college: SavedCollege) => void;
+  removeSavedCollege: (collegeName: string) => void;
   addActivity: (activity: Omit<Activity, 'id' | 'timestamp'>) => void;
   login: (userData: UserData) => void;
   logout: () => void;
   reset: () => void;
 }
 
-const initialState: Omit<ResultsState, 'setQuizAnswers' | 'setCareerSuggestions' | 'setCollegeRecommendations' | 'setChosenCareer' | 'addSavedCollege' | 'addActivity' | 'login' | 'logout' | 'reset'> = {
+const initialState: Omit<ResultsState, 'setQuizAnswers' | 'setCareerSuggestions' | 'setCollegeRecommendations' | 'setChosenCareer' | 'addSavedCollege' | 'removeSavedCollege' | 'addActivity' | 'login' | 'logout' | 'reset'> = {
   quizAnswers: {},
   careerSuggestions: null,
   collegeRecommendations: null,
@@ -63,6 +64,9 @@ export const useResultsStore = create<ResultsState>()(
       setCollegeRecommendations: (recommendations) => set((state) => ({ ...state, collegeRecommendations: recommendations })),
       setChosenCareer: (career) => set((state) => ({ ...state, chosenCareer: career })),
       addSavedCollege: (college) => set((state) => ({ savedColleges: [...state.savedColleges, college] })),
+      removeSavedCollege: (collegeName) => set((state) => ({
+        savedColleges: state.savedColleges.filter(c => c.collegeName !== collegeName)
+      })),
       addActivity: (activity) => set((state) => ({
         activityLog: [
             { ...activity, id: Date.now().toString(), timestamp: Date.now() },
@@ -85,3 +89,5 @@ export const useResultsStore = create<ResultsState>()(
     }
   )
 );
+
+    

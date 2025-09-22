@@ -7,14 +7,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building, MapPin, Bookmark, Search, Loader2, Star, Milestone, IndianRupee, GraduationCap } from "lucide-react";
+import { Building, MapPin, Search, Loader2, Star, Milestone, IndianRupee, GraduationCap, Trash2, ShoppingBasket } from "lucide-react";
 import Link from "next/link";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { searchColleges, SearchCollegesOutput } from "@/ai/flows/search-colleges";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 function SearchResultSkeleton() {
   return (
@@ -44,24 +53,46 @@ export default function CollegesPage() {
   const store = useResultsStore();
   const [savedColleges, setSavedColleges] = useState(store.savedColleges);
   const { toast } = useToast();
-  const { addActivity } = useResultsStore();
+  const { addActivity, removeSavedCollege } = useResultsStore();
 
-  const [location, setLocation] = useState(store.quizAnswers?.location as string || "");
+  const [location, setLocation] = useState("");
   const [distance, setDistance] = useState(500);
   const [stream, setStream] = useState("Computer Science");
   const [sortBy, setSortBy] = useState("ranking");
   const [searchResults, setSearchResults] = useState<SearchCollegesOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+    const unsub = useResultsStore.subscribe(
+      (state) => {
+        setSavedColleges(state.savedColleges);
+        if (state.quizAnswers?.location) {
+          setLocation(state.quizAnswers.location as string);
+        }
+      }
+    );
+
+    // Initial sync
     setSavedColleges(store.savedColleges);
     if (store.quizAnswers?.location) {
-      setLocation(store.quizAnswers.location as string);
+        setLocation(store.quizAnswers.location as string);
     }
+    
+    return () => unsub();
   }, [store.savedColleges, store.quizAnswers]);
 
 
   const handleSearch = async () => {
+    if (!location) {
+      toast({
+        variant: "destructive",
+        title: "Location Required",
+        description: "Please enter your location to search for colleges.",
+      });
+      return;
+    }
     setIsLoading(true);
     setSearchResults(null);
     try {
@@ -84,27 +115,68 @@ export default function CollegesPage() {
       setIsLoading(false);
     }
   };
+  
+  const handleRemoveCollege = (collegeName: string) => {
+    removeSavedCollege(collegeName);
+    toast({
+        title: "College Removed",
+        description: `${collegeName} has been removed from your bucket.`,
+    })
+  }
+
+  if (!isClient) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold font-headline">Explore Colleges</h1>
         <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">
-          Find the perfect government and private colleges to launch your career.
+          Find the perfect government colleges to launch your career.
         </p>
       </div>
 
       {savedColleges.length > 0 && (
         <div className="mb-12">
-            <h2 className="text-2xl font-bold font-headline mb-4 flex items-center gap-2"><Bookmark /> My Saved Colleges</h2>
+            <h2 className="text-2xl font-bold font-headline mb-4 flex items-center gap-2"><ShoppingBasket /> Career Bucket</h2>
             <Card>
                 <CardContent className="p-6 space-y-4">
                     {savedColleges.map((college, index) => (
-                        <Alert key={index}>
-                           <Building className="h-4 w-4" />
-                           <AlertTitle>{college.collegeName}</AlertTitle>
-                           <AlertDescription>{college.reason}</AlertDescription>
-                        </Alert>
+                        <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                           <div className="flex items-start gap-4">
+                             <Building className="h-5 w-5 mt-1 text-primary" />
+                             <div>
+                               <p className="font-semibold">{college.collegeName}</p>
+                               <p className="text-sm text-muted-foreground">{college.reason}</p>
+                             </div>
+                           </div>
+                           <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                    <Trash2 className="text-destructive" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    This will permanently remove '{college.collegeName}' from your Career Bucket.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                  <AlertDialogAction onClick={() => handleRemoveCollege(college.collegeName)}>
+                                    Remove
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
                     ))}
                 </CardContent>
             </Card>
@@ -113,7 +185,7 @@ export default function CollegesPage() {
 
       {savedColleges.length === 0 && (
          <div className="text-center mb-12 py-8 bg-muted rounded-lg">
-            <h3 className="text-xl font-semibold">No Saved Colleges Yet</h3>
+            <h3 className="text-xl font-semibold">Your Career Bucket is Empty</h3>
             <p className="text-muted-foreground mt-2">Go to your <Button variant="link" asChild className="p-0"><Link href="/profile">Profile</Link></Button> to get personalized recommendations and save them here.</p>
         </div>
       )}
@@ -190,15 +262,14 @@ export default function CollegesPage() {
                     <div className="flex items-center gap-2"><IndianRupee /> <strong>Fees:</strong> {college.fees}</div>
                     <div className="flex items-center gap-2"><GraduationCap /> <strong>Ranking:</strong> {college.ranking}</div>
                   </div>
-                  <Separator />
-                  <div>
+                  <Alert className="mt-4">
                     <h4 className="font-semibold mb-2">Relevant Courses</h4>
                     <div className="flex flex-wrap gap-2">
                       {college.courses.map(course => (
                         <div key={course} className="text-sm bg-secondary text-secondary-foreground rounded px-2 py-1">{course}</div>
                       ))}
                     </div>
-                  </div>
+                  </Alert>
                 </CardContent>
               </Card>
             ))
@@ -209,3 +280,5 @@ export default function CollegesPage() {
     </div>
   );
 }
+
+    
