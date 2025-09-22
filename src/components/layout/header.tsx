@@ -37,7 +37,7 @@ export function Header() {
                   <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Colleges
                   </NavigationMenuLink>
-                </Link>              
+                </Link>
               </NavigationMenuItem>
                <NavigationMenuItem>
                 <Link href="/profile" legacyBehavior passHref>

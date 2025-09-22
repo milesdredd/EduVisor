@@ -41,7 +41,7 @@ const prompt = ai.definePrompt({
   output: {schema: CollegeRecommendationsOutputSchema},
   prompt: `Based on the following suggested careers: {{suggestedCareers}},
   recommend a list of potential Indian government colleges and their relevant educational tracks.
-  Focus exclusively on government colleges within India.`,
+  Focus exclusively on government colleges within India. Do not include private colleges.`,
 });
 
 const collegeRecommendationsFlow = ai.defineFlow(
