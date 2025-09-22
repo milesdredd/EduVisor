@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -44,16 +45,20 @@ export default function CollegesPage() {
   const [savedColleges, setSavedColleges] = useState(store.savedColleges);
   const { toast } = useToast();
 
-  useEffect(() => {
-    setSavedColleges(store.savedColleges);
-  }, [store.savedColleges]);
-
-  const [location, setLocation] = useState("Mumbai, Maharashtra");
+  const [location, setLocation] = useState(store.user?.location || "");
   const [distance, setDistance] = useState(500);
   const [stream, setStream] = useState("Computer Science");
   const [sortBy, setSortBy] = useState("ranking");
   const [searchResults, setSearchResults] = useState<SearchCollegesOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setSavedColleges(store.savedColleges);
+    if (store.user?.location) {
+      setLocation(store.user.location);
+    }
+  }, [store.savedColleges, store.user]);
+
 
   const handleSearch = async () => {
     setIsLoading(true);
@@ -120,7 +125,7 @@ export default function CollegesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-end">
             <div className="space-y-2">
               <label className="text-sm font-medium">Your Location (City, State)</label>
-              <Input placeholder="e.g. Delhi" value={location} onChange={(e) => setLocation(e.target.value)} />
+              <Input placeholder="e.g. Mumbai, Maharashtra" value={location} onChange={(e) => setLocation(e.target.value)} />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Stream / Career</label>

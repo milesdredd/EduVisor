@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck } from "lucide-react";
+import { FileText, Briefcase, Building, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck, LogOut } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -47,6 +48,7 @@ export default function ProfilePage() {
     const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
     const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
     const [savedColleges, setSavedColleges] = useState(store.savedColleges);
+    const [user, setUser] = useState(store.user);
     
     const { toast } = useToast();
     const router = useRouter();
@@ -55,7 +57,8 @@ export default function ProfilePage() {
       setCareerSuggestions(store.careerSuggestions);
       setChosenCareer(store.chosenCareer);
       setSavedColleges(store.savedColleges);
-    }, [store.careerSuggestions, store.chosenCareer, store.savedColleges]);
+      setUser(store.user);
+    }, [store.careerSuggestions, store.chosenCareer, store.savedColleges, store.user]);
     
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
       setScores(prev => ({ ...prev, [category]: value[0] }));
@@ -133,17 +136,26 @@ export default function ProfilePage() {
         });
     };
   
+    const handleLogout = () => {
+      store.logout();
+      store.reset();
+      router.push('/login');
+    }
+
   return (
     <div className="container mx-auto py-12 space-y-12">
-      <div className="flex items-center space-x-6">
-        <Avatar className="h-24 w-24">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
-        <div className="space-y-1">
-          <h1 className="text-4xl font-bold font-headline">Alex Doe</h1>
-          <p className="text-muted-foreground text-lg">alex.doe@example.com</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div className="flex items-center space-x-6">
+            <Avatar className="h-24 w-24">
+            <AvatarImage src={`https://api.dicebear.com/7.x/pixel-art/svg?seed=${user?.username}`} alt={user?.username} />
+            <AvatarFallback>{user?.username?.[0].toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+            <h1 className="text-4xl font-bold font-headline">{user?.username}</h1>
+            <p className="text-muted-foreground text-lg">{user?.email}</p>
+            </div>
         </div>
+        <Button variant="outline" onClick={handleLogout}><LogOut className="mr-2"/> Logout</Button>
       </div>
 
        <Card className="bg-primary/5">
@@ -304,7 +316,7 @@ export default function ProfilePage() {
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" className="w-full">
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Reset My Data
+                    Reset My Quiz Data
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -312,7 +324,7 @@ export default function ProfilePage() {
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
                       This action cannot be undone. This will permanently delete your
-                      quiz answers and career suggestions.
+                      quiz answers and career suggestions, but your login information will be kept.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
