@@ -131,6 +131,7 @@ export function QuizForm() {
           <FormField
             control={form.control}
             name={currentQuestion.id as keyof QuizFormValues}
+            key={currentQuestion.id}
             render={({ field }) => (
               <FormItem className="space-y-4">
                 <FormLabel className="text-xl font-semibold">{currentQuestion.question}</FormLabel>
@@ -181,10 +182,14 @@ export function QuizForm() {
                     </div>
                   ) : (
                     <Input
-                      {...field}
                       type={currentQuestion.type}
                       placeholder={currentQuestion.placeholder}
                       value={field.value || ''}
+                      onChange={field.onChange}
+                      name={field.name}
+                      ref={field.ref}
+                      onBlur={field.onBlur}
+                      disabled={field.disabled}
                     />
                   )}
                 </FormControl>
