@@ -26,6 +26,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useRouter } from 'next/navigation';
+import { TimelineTracker } from '@/components/dashboard/timeline-tracker';
 
 type CollegeRecommendation = PersonalizedCollegeSuggestionsOutput['recommendations'][0];
 
@@ -280,28 +281,7 @@ export default function ProfilePage() {
             </Card>
         </div>
         <div className="space-y-8">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Bell /> Timeline Tracker</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center">
-                <div className="bg-primary/20 text-primary p-2 rounded-md">
-                    <p className="font-bold text-sm">JUN</p>
-                    <p className="font-bold text-2xl">15</p>
-                </div>
-                <p className="ml-4 text-sm">JEE Advanced Application Deadline</p>
-              </div>
-              <Separator />
-               <div className="flex items-center">
-                <div className="bg-primary/20 text-primary p-2 rounded-md">
-                    <p className="font-bold text-sm">JUL</p>
-                    <p className="font-bold text-2xl">01</p>
-                </div>
-                <p className="ml-4 text-sm">VITEEE Counseling Starts</p>
-              </div>
-            </CardContent>
-          </Card>
+          <TimelineTracker career={chosenCareer?.title} isLocked={!chosenCareer} />
 
           <Card>
             <CardHeader>

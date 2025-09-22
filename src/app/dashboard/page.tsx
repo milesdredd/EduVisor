@@ -10,8 +10,9 @@ import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Compass, BookOpen, Newspaper, CalendarDays, Target, Bot, Users, ArrowRight, Lock } from 'lucide-react';
+import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock } from 'lucide-react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
+import { TimelineTracker } from '@/components/dashboard/timeline-tracker';
 
 // Mock data for syllabus - in a real app, this might come from an API based on the chosen career
 const MOCK_SYLLABUS = [
@@ -166,22 +167,7 @@ export default function DashboardPage() {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><CalendarDays /> Timeline Tracker</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                          <div className="flex items-start gap-3">
-                            <Badge>JUN 15</Badge>
-                            <p className="text-sm">JEE Advanced Application Deadline</p>
-                          </div>
-                          <Separator />
-                           <div className="flex items-start gap-3">
-                            <Badge>JUL 01</Badge>
-                            <p className="text-sm">VITEEE Counseling Starts</p>
-                          </div>
-                        </CardContent>
-                    </Card>
+                    <TimelineTracker career={chosenCareer?.title} isLocked={!chosenCareer} />
 
                     <Card className="bg-secondary">
                          <CardHeader>
