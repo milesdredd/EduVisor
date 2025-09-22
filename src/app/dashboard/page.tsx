@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock, Loader2 } from 'lucide-react';
+import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock, Loader2, CalendarDays } from 'lucide-react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { TimelineTracker } from '@/components/dashboard/timeline-tracker';
 import { getDashboardDetails, DashboardDetailsOutput } from '@/ai/flows/dashboard-details';
