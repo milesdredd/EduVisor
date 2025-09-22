@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap } from "lucide-react";
+import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -17,6 +17,18 @@ import { getCollegeRecommendations, type CollegeRecommendationsOutput } from "@/
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { useResultsStore } from "@/hooks/use-results-store";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 
 function CareerDetailSkeleton() {
@@ -122,6 +134,9 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
   const [isCollegesLoading, setIsCollegesLoading] = useState(false);
   const [collegeRecommendations, setCollegeRecommendations] = useState<CollegeRecommendationsOutput | null>(null);
   const { toast } = useToast();
+  const { chosenCareer, setChosenCareer } = useResultsStore();
+  const isCareerChosen = chosenCareer?.title === career?.title;
+
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -161,6 +176,16 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
       });
     } finally {
       setIsCollegesLoading(false);
+    }
+  };
+
+  const handleChooseCareer = () => {
+    if (career) {
+      setChosenCareer(career);
+      toast({
+        title: "Path Chosen!",
+        description: `You've selected '${career.title}' as your career path.`,
+      });
     }
   };
 
@@ -205,10 +230,35 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
       <div className="space-y-10">
         <Card>
             <CardHeader>
-            <CardTitle className="text-4xl font-headline">{career.title}</CardTitle>
-            <CardDescription>
-                A comprehensive look at the career path of a {career.title}.
-            </CardDescription>
+              <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-4xl font-headline">{career.title}</CardTitle>
+                    <CardDescription>
+                        A comprehensive look at the career path of a {career.title}.
+                    </CardDescription>
+                  </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                       <Button disabled={isCareerChosen} variant={isCareerChosen ? "secondary" : "default"}>
+                        {isCareerChosen ? <CheckCircle className="mr-2" /> : <Heart className="mr-2" />}
+                         {isCareerChosen ? "Path Chosen" : "Choose This Career Path"}
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you ready to commit to this path?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                           <p className="italic text-center my-4">"The future depends on what you do today." - Mahatma Gandhi</p>
+                           This action will set '{career.title}' as your chosen career path. You can always explore and change your path later. 😉
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleChooseCareer}>I Agree</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+              </div>
             </CardHeader>
         </Card>
 
@@ -325,5 +375,4 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
       </div>
     </div>
   );
-
-    
+}

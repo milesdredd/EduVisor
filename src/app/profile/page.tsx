@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2 } from "lucide-react";
+import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -27,7 +28,7 @@ export default function ProfilePage() {
     
     const [isLoading, setIsLoading] = useState(false);
     const [recommendations, setRecommendations] = useState<PersonalizedCollegeSuggestionsOutput | null>(null);
-    const { careerSuggestions } = useResultsStore();
+    const { careerSuggestions, chosenCareer } = useResultsStore();
     const { toast } = useToast();
     
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
@@ -82,6 +83,35 @@ export default function ProfilePage() {
           <p className="text-muted-foreground text-lg">alex.doe@example.com</p>
         </div>
       </div>
+
+       <Card className="bg-primary/5">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-3 text-primary">
+                    <Compass size={28} />
+                    Your Chosen Path
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                {chosenCareer ? (
+                    <div>
+                        <h2 className="text-3xl font-bold font-headline">{chosenCareer.title}</h2>
+                        <p className="text-muted-foreground mt-2">This is your starting point. Explore the resources below to prepare for your journey.</p>
+                        <Button variant="link" asChild className="p-0 mt-2">
+                           <Link href={`/career/${encodeURIComponent(chosenCareer.title.toLowerCase().replace(/ /g, '-'))}`}>
+                                Review Career Details
+                           </Link>
+                        </Button>
+                    </div>
+                ) : (
+                    <div className="text-center py-8">
+                        <p className="text-muted-foreground mb-4">You haven't chosen a career path yet. Let's find one!</p>
+                        <Button asChild>
+                            <Link href="/quiz">Take the Assessment</Link>
+                        </Button>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2 space-y-8">
