@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { PersonalizedCareerSuggestionsOutput } from '@/ai/flows/personalized-career-suggestions';
@@ -24,7 +25,7 @@ interface ResultsState {
   reset: () => void;
 }
 
-const initialState = {
+const initialState: Omit<ResultsState, 'setQuizAnswers' | 'setCareerSuggestions' | 'setCollegeRecommendations' | 'setChosenCareer' | 'addSavedCollege' | 'reset'> = {
   quizAnswers: {},
   careerSuggestions: null,
   collegeRecommendations: null,
@@ -32,7 +33,7 @@ const initialState = {
   savedColleges: [],
 };
 
-const useResultsStoreBase = create<ResultsState>()(
+export const useResultsStore = create<ResultsState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -40,9 +41,9 @@ const useResultsStoreBase = create<ResultsState>()(
       setCareerSuggestions: (suggestions) => set((state) => ({ ...state, careerSuggestions: suggestions })),
       setCollegeRecommendations: (recommendations) => set((state) => ({ ...state, collegeRecommendations: recommendations })),
       setChosenCareer: (career) => set((state) => ({ ...state, chosenCareer: career })),
-      addSavedCollege: (college) => set((state) => ({ ...state, savedColleges: [...state.savedColleges, college] })),
+      addSavedCollege: (college) => set((state) => ({ savedColleges: [...state.savedColleges, college] })),
       reset: () => {
-        set({...initialState, chosenCareer: null, savedColleges: []});
+        set(initialState);
       },
     }),
     {
@@ -52,13 +53,24 @@ const useResultsStoreBase = create<ResultsState>()(
   )
 );
 
-export const useResultsStore = () => {
+// This custom hook is used to handle the hydration issue with Zustand and localStorage.
+export const useHydratedResultsStore = () => {
   const [hydrated, setHydrated] = useState(false);
-  const store = useResultsStoreBase();
+  const store = useResultsStore();
 
   useEffect(() => {
     setHydrated(true);
   }, []);
 
-  return hydrated ? store : (initialState as unknown as ResultsState & { reset: () => void; setCareerSuggestions: (s: any) => void; setChosenCareer: (c: any) => void; addSavedCollege: (c: any) => void});
+  const initialStateWithFunctions = {
+    ...initialState,
+    setQuizAnswers: () => {},
+    setCareerSuggestions: () => {},
+    setCollegeRecommendations: () => {},
+    setChosenCareer: () => {},
+    addSavedCollege: () => {},
+    reset: () => {},
+  } as ResultsState;
+
+  return hydrated ? store : initialStateWithFunctions;
 };
