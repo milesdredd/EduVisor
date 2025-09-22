@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export default function WelcomePage() {
   const store = useResultsStore();
@@ -23,17 +24,21 @@ export default function WelcomePage() {
     router.push('/quiz');
   };
 
+  const heroImage = PlaceHolderImages.find(img => img.id === 'pathfinder-hero');
+
   return (
     <div className="flex flex-col">
        <section className="relative w-full h-[60vh] flex items-center justify-center text-center">
-        <Image
-            src="/home_bg.jpeg"
-            alt="An inspiring image of a person looking towards a horizon"
-            fill
-            className="object-cover"
-            priority
-            data-ai-hint="inspiring horizon"
-        />
+        {heroImage && (
+          <Image
+              src={heroImage.imageUrl}
+              alt={heroImage.description}
+              fill
+              className="object-cover"
+              priority
+              data-ai-hint={heroImage.imageHint}
+          />
+        )}
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 space-y-6 text-white px-4">
             <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
@@ -107,7 +112,7 @@ export default function WelcomePage() {
               <CardContent>
                 <p className="text-muted-foreground">Individuals with higher education often experience lower unemployment rates and greater job security.</p>
               </CardContent>
-            </Card>
+            </card>
           </div>
         </div>
       </section>

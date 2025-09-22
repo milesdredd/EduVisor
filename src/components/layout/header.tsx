@@ -21,7 +21,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image src="/logo.png" alt="EduVisor Logo" width={70} height={20} />
+            <Image src="https://picsum.photos/seed/logo/70/20" alt="EduVisor Logo" width={70} height={20} />
           </Link>
           <NavigationMenu>
             <NavigationMenuList>
