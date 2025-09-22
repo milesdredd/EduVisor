@@ -8,19 +8,14 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock } from 'lucide-react';
+import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock, Loader2 } from 'lucide-react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { TimelineTracker } from '@/components/dashboard/timeline-tracker';
-
-// Mock data for syllabus - in a real app, this might come from an API based on the chosen career
-const MOCK_SYLLABUS = [
-  { id: 'syllabus1', label: 'Data Structures & Algorithms' },
-  { id: 'syllabus2', label: 'System Design Principles' },
-  { id: 'syllabus3', label: 'Fundamentals of Product Management' },
-];
+import { getDashboardDetails, DashboardDetailsOutput } from '@/ai/flows/dashboard-details';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 function LockedDashboardOverlay() {
     return (
@@ -35,14 +30,82 @@ function LockedDashboardOverlay() {
     );
 }
 
+function DashboardSkeleton() {
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-8">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
+                        <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <Skeleton className="h-6 w-3/4" />
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-5/6" />
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><BookOpen /> Top Resources</CardTitle>
+                        <CardDescription>Curated books and articles to get you started.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                       <Skeleton className="h-5 w-full" />
+                       <Skeleton className="h-5 w-4/5" />
+                    </CardContent>
+                </Card>
+                
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Newspaper /> Latest News & Trends</CardTitle>
+                        <CardDescription>Stay updated with what's happening in your future career.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <Skeleton className="h-5 w-1/2" />
+                        <Skeleton className="h-4 w-full" />
+                    </CardContent>
+                </Card>
+            </div>
+            <div className="space-y-8">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Overall Progress</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 text-center">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-3/4 mx-auto" />
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                         <CardTitle className="flex items-center gap-2"><CalendarDays /> Timeline Tracker</CardTitle>
+                         <CardDescription>Key dates for your upcoming applications and exams.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex justify-center items-center h-24">
+                           <Loader2 className="animate-spin text-primary" />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    )
+}
+
 
 export default function DashboardPage() {
     const store = useResultsStore();
     const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
     const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
+    const { toast } = useToast();
+
+    const [details, setDetails] = useState<DashboardDetailsOutput | null>(null);
+    const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+
     const isLocked = !chosenCareer && !careerSuggestions;
     const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
-
 
     useEffect(() => {
         const unsub = useResultsStore.subscribe((state) => {
@@ -52,19 +115,48 @@ export default function DashboardPage() {
         return () => unsub();
     }, []);
 
-    const [syllabusProgress, setSyllabusProgress] = useState<Record<string, boolean>>({
-      syllabus1: false,
-      syllabus2: false,
-      syllabus3: false, 
-    });
+    useEffect(() => {
+        if (chosenCareer) {
+            const fetchDetails = async () => {
+                setIsLoadingDetails(true);
+                try {
+                    const result = await getDashboardDetails({ career: chosenCareer.title });
+                    setDetails(result);
+                } catch (error) {
+                    console.error("Failed to fetch dashboard details:", error);
+                    toast({
+                        variant: "destructive",
+                        title: "Error loading dashboard",
+                        description: "Could not load personalized content. Please try again later.",
+                    })
+                } finally {
+                    setIsLoadingDetails(false);
+                }
+            };
+            fetchDetails();
+        }
+    }, [chosenCareer, toast]);
+
+    const [syllabusProgress, setSyllabusProgress] = useState<Record<string, boolean>>({});
+
+    useEffect(() => {
+        if (details?.syllabus) {
+            const initialProgress = details.syllabus.reduce((acc, item) => {
+                acc[item.id] = false;
+                return acc;
+            }, {} as Record<string, boolean>);
+            setSyllabusProgress(initialProgress);
+        }
+    }, [details]);
+
 
     const handleSyllabusChange = (id: string, checked: CheckedState) => {
         setSyllabusProgress(prev => ({ ...prev, [id]: !!checked }));
     };
 
-    const overallProgress = Math.round(
-      (Object.values(syllabusProgress).filter(Boolean).length / MOCK_SYLLABUS.length) * 100
-    );
+    const overallProgress = details?.syllabus?.length
+      ? Math.round((Object.values(syllabusProgress).filter(Boolean).length / details.syllabus.length) * 100)
+      : 0;
     
     return (
         <div className="container mx-auto py-12 space-y-8">
@@ -103,108 +195,128 @@ export default function DashboardPage() {
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
+            <div className="relative">
                 {isLocked && <LockedDashboardOverlay />}
 
-                {/* Left Column */}
-                <div className="lg:col-span-2 space-y-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
-                            <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-3">
-                                {MOCK_SYLLABUS.map(item => (
-                                    <div key={item.id} className="flex items-center">
-                                        <Checkbox
-                                            id={item.id}
-                                            checked={!isLocked && syllabusProgress[item.id]}
-                                            onCheckedChange={(checked) => handleSyllabusChange(item.id, checked)}
-                                            disabled={isLocked}
-                                            className="mr-3"
-                                        />
-                                        <label
-                                            htmlFor={item.id}
-                                            className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
-                                                syllabusProgress[item.id] && !isLocked ? 'line-through text-muted-foreground' : ''
-                                            }`}
-                                        >
-                                            {item.label}
-                                        </label>
+                {(isLoadingDetails && !isLocked) ? <DashboardSkeleton /> : (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Left Column */}
+                    <div className="lg:col-span-2 space-y-8">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
+                                <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {details?.syllabus ? (
+                                    <div className="space-y-3">
+                                        {details.syllabus.map(item => (
+                                            <div key={item.id} className="flex items-center">
+                                                <Checkbox
+                                                    id={item.id}
+                                                    checked={!isLocked && syllabusProgress[item.id]}
+                                                    onCheckedChange={(checked) => handleSyllabusChange(item.id, checked)}
+                                                    disabled={isLocked}
+                                                    className="mr-3"
+                                                />
+                                                <label
+                                                    htmlFor={item.id}
+                                                    className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                                                        syllabusProgress[item.id] && !isLocked ? 'line-through text-muted-foreground' : ''
+                                                    }`}
+                                                >
+                                                    {item.label}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">No syllabus available yet. Choose a career to get started.</p>
+                                )}
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><BookOpen /> Top Resources</CardTitle>
+                                <CardDescription>Curated books and articles to get you started.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                {details?.resources?.map((res, index) => (
+                                    <div key={index} className="flex items-start gap-3">
+                                        <div className="bg-secondary p-2 rounded-full">
+                                           <BookOpen className="w-4 h-4 text-secondary-foreground"/>
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold">{res.title}</p>
+                                            <p className="text-xs text-muted-foreground capitalize">{res.type}</p>
+                                        </div>
                                     </div>
                                 ))}
-                            </div>
-                        </CardContent>
-                    </Card>
+                            </CardContent>
+                            <CardFooter>
+                                <Button variant="secondary" disabled={isLocked}>Explore More Resources</Button>
+                            </CardFooter>
+                        </Card>
+                        
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><Newspaper /> Latest News & Trends</CardTitle>
+                                <CardDescription>Stay updated with what's happening in the world of {chosenCareer ? chosenCareer.title : "your future career"}.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {details?.news?.map((item, index) => (
+                                    <div key={index}>
+                                        <p className="font-medium">{item.headline}</p>
+                                        <p className="text-sm text-muted-foreground">{item.summary}</p>
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><BookOpen /> Top Resources</CardTitle>
-                            <CardDescription>Curated books and articles to get you started.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p>1. "Cracking the PM Interview" by Gayle Laakmann McDowell</p>
-                            <p>2. "Inspired: How to Create Tech Products Customers Love" by Marty Cagan</p>
-                        </CardContent>
-                         <CardFooter>
-                            <Button variant="secondary" disabled={isLocked}>Explore More Resources</Button>
-                        </CardFooter>
-                    </Card>
-                    
-                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Newspaper /> Latest News & Trends</CardTitle>
-                            <CardDescription>Stay updated with what's happening in the world of {chosenCareer ? chosenCareer.title : "your future career"}.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                            <p className="font-medium">AI's Impact on Product Management is Growing</p>
-                            <p className="text-sm text-muted-foreground">Product managers are increasingly leveraging AI tools for market analysis and feature prioritization...</p>
-                        </CardContent>
-                    </Card>
+                    {/* Right Column */}
+                    <div className="space-y-8">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Overall Progress</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3 text-center">
+                                <Progress value={!isLocked ? overallProgress : 0} />
+                                <p className="text-sm text-muted-foreground">
+                                    {!isLocked ? `You're ${overallProgress}% of the way there. Keep going!` : 'Complete the quiz to start your progress.'}
+                                </p>
+                            </CardContent>
+                        </Card>
 
+                        <TimelineTracker career={timelineCareer} isLocked={isLocked} />
+
+                        <Card className="bg-secondary">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><Bot /> AI Study Helper</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">Get a personalized timetable, find answers to complex questions, and more.</p>
+                            </CardContent>
+                            <CardFooter>
+                                <Button className="w-full" disabled={isLocked}>
+                                    Create My Study Plan <ArrowRight className="ml-2"/>
+                                </Button>
+                            </CardFooter>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><Users /> Talk to a Mentor</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground">Connect with industry professionals.</p>
+                                <Badge variant="outline" className="mt-2">Coming Soon</Badge>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
-
-                {/* Right Column */}
-                <div className="space-y-8">
-                     <Card>
-                        <CardHeader>
-                            <CardTitle>Overall Progress</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3 text-center">
-                            <Progress value={!isLocked ? overallProgress : 0} />
-                            <p className="text-sm text-muted-foreground">
-                                {!isLocked ? `You're ${overallProgress}% of the way there. Keep going!` : 'Complete the quiz to start your progress.'}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <TimelineTracker career={timelineCareer} isLocked={isLocked} />
-
-                    <Card className="bg-secondary">
-                         <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Bot /> AI Study Helper</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">Get a personalized timetable, find answers to complex questions, and more.</p>
-                        </CardContent>
-                        <CardFooter>
-                            <Button className="w-full" disabled={isLocked}>
-                                Create My Study Plan <ArrowRight className="ml-2"/>
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                     <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2"><Users /> Talk to a Mentor</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-muted-foreground">Connect with industry professionals.</p>
-                            <Badge variant="outline" className="mt-2">Coming Soon</Badge>
-                        </CardContent>
-                    </Card>
-                </div>
+                )}
             </div>
         </div>
     );
