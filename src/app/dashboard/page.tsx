@@ -197,7 +197,7 @@ export default function DashboardPage() {
                          <Card>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2"><Users /> Talk to a Mentor</CardTitle>
-                            </CardHeader>
+                            </Header>
                             <CardContent>
                                 <p className="text-muted-foreground">Connect with industry professionals.</p>
                                 <Badge variant="outline" className="mt-2">Coming Soon</Badge>
