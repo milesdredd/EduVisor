@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useResultsStore } from "@/hooks/use-results-store";
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Bot } from "lucide-react";
 
 const formSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters."),
@@ -54,6 +54,12 @@ export default function LoginPage() {
     });
     router.push("/");
   }
+
+  const handleDemoLogin = () => {
+    form.setValue("username", "rahul");
+    form.setValue("email", "demo@gmail.com");
+    form.setValue("password", "12345678");
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
@@ -116,9 +122,14 @@ export default function LoginPage() {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit" className="w-full">
-                      Start My Journey <ArrowRight className="ml-2" />
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <Button type="button" variant="outline" onClick={handleDemoLogin} className="w-full">
+                           <Bot className="mr-2" /> Fill Demo Data
+                        </Button>
+                        <Button type="submit" className="w-full">
+                          Start My Journey <ArrowRight className="ml-2" />
+                        </Button>
+                    </div>
                   </form>
                 </Form>
               </CardContent>
