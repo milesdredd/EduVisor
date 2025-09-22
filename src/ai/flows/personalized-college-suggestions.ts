@@ -33,6 +33,16 @@ export type PersonalizedCollegeSuggestionsInput = z.infer<
   typeof PersonalizedCollegeSuggestionsInputSchema
 >;
 
+const CollegeAttributesSchema = z.object({
+  distance: z.number().min(0).max(100).describe("Score for proximity/distance."),
+  programs: z.number().min(0).max(100).describe("Score for program relevance and quality."),
+  labs: z.number().min(0).max(100).describe("Score for lab facilities."),
+  hostel: z.number().min(0).max(100).describe("Score for hostel quality."),
+  cutoffs: z.number().min(0).max(100).describe("Score for academic rigor/high cutoffs."),
+  placements: z.number().min(0).max(100).describe("Score for placement success."),
+  accessibility: z.number().min(0).max(100).describe("Score for accessibility."),
+});
+
 const PersonalizedCollegeSuggestionsOutputSchema = z.object({
   recommendations: z.array(
     z.object({
@@ -40,10 +50,11 @@ const PersonalizedCollegeSuggestionsOutputSchema = z.object({
       reason: z
         .string()
         .describe(
-          'A brief explanation for why this college is a good fit based on the user\'s career goals and preferences.'
+          'A brief explanation for why this college is a good fit based on the user\'s career goals.'
         ),
+      attributes: CollegeAttributesSchema.describe("A breakdown of the college's scores for each attribute."),
     })
-  ).describe('A list of personalized college recommendations.'),
+  ).describe('A list of personalized college recommendations with detailed attribute scores.'),
 });
 export type PersonalizedCollegeSuggestionsOutput = z.infer<
   typeof PersonalizedCollegeSuggestionsOutputSchema
@@ -59,26 +70,17 @@ const prompt = ai.definePrompt({
   name: 'personalizedCollegeSuggestionsPrompt',
   input: {schema: PersonalizedCollegeSuggestionsInputSchema},
   output: {schema: PersonalizedCollegeSuggestionsOutputSchema},
-  prompt: `You are an expert career counselor for students in India. Your task is to recommend ONLY Indian government colleges based on the user's career aspirations and their stated preferences.
+  prompt: `You are an expert career counselor for students in India. Your task is to recommend ONLY Indian government colleges based on the user's career aspirations.
 
 **User's Suggested Careers:**
 {{#each suggestedCareers}}
 - {{{this}}}
 {{/each}}
 
-**User's College Preferences (weighted 0-100):**
-- Importance of Distance: {{{fitScorerPreferences.distance}}}
-- Importance of Programs Offered: {{{fitScorerPreferences.programs}}}
-- Importance of Lab Facilities: {{{fitScorerPreferences.labs}}}
-- Importance of Hostel Quality: {{{fitScorerPreferences.hostel}}}
-- Importance of High Cutoffs (academic rigor): {{{fitScorerPreferences.cutoffs}}}
-- Importance of Placement Success: {{{fitScorerPreferences.placements}}}
-- Importance of Accessibility: {{{fitScorerPreferences.accessibility}}}
-
 **Your Task:**
-1.  Analyze the user's career goals and their preferences.
-2.  Recommend a list of 3-4 suitable INDIAN GOVERNMENT COLLEGES.
-3.  For each recommendation, provide a brief reason that connects the college to the user's career paths and most heavily weighted preferences.
+1.  Recommend a list of 4-5 suitable INDIAN GOVERNMENT COLLEGES.
+2.  For each recommendation, provide a brief reason that connects the college to the user's career paths.
+3.  CRITICAL: For each recommended college, you MUST provide a score from 0 to 100 for EACH of the following attributes based on real-world data and reputation: distance (assume a lower score for farther colleges), programs, labs, hostel, cutoffs (academic rigor), placements, and accessibility. These scores should be objective measures of the college's strengths.
 4.  CRITICAL: Verify that each college is a government-funded and operated institution located within India. Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
 `,
 });

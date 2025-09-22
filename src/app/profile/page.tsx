@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useRouter } from 'next/navigation';
 
+type CollegeRecommendation = PersonalizedCollegeSuggestionsOutput['recommendations'][0];
+
 export default function ProfilePage() {
     const [scores, setScores] = useState({
       distance: 50,
@@ -39,7 +41,7 @@ export default function ProfilePage() {
     });
     
     const [isLoading, setIsLoading] = useState(false);
-    const [recommendations, setRecommendations] = useState<PersonalizedCollegeSuggestionsOutput | null>(null);
+    const [recommendations, setRecommendations] = useState<CollegeRecommendation[] | null>(null);
     const store = useResultsStore();
     const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
     const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
@@ -58,10 +60,29 @@ export default function ProfilePage() {
       setScores(prev => ({ ...prev, [category]: value[0] }));
     };
 
-    const calculateFitScore = () => {
-        const total = Object.values(scores).reduce((sum, score) => sum + score, 0);
-        return Math.round(total / Object.keys(scores).length);
+    const calculateOverallFitScore = (collegeAttributes: CollegeRecommendation['attributes']) => {
+        if (!collegeAttributes) return 0;
+        
+        const weightedSum = Object.keys(scores).reduce((sum, key) => {
+            const preference = scores[key as keyof typeof scores];
+            const attribute = collegeAttributes[key as keyof typeof collegeAttributes];
+            return sum + (preference * attribute);
+        }, 0);
+
+        const totalWeight = Object.values(scores).reduce((sum, score) => sum + score, 0);
+        if (totalWeight === 0) return 0;
+
+        return Math.round((weightedSum / totalWeight));
     }
+
+    const sortedRecommendations = recommendations 
+      ? [...recommendations].sort((a, b) => {
+          const scoreA = calculateOverallFitScore(a.attributes);
+          const scoreB = calculateOverallFitScore(b.attributes);
+          return scoreB - scoreA;
+        })
+      : [];
+
 
     const handleFetchRecommendations = async () => {
         if (!careerSuggestions || careerSuggestions.suggestions.length === 0) {
@@ -81,7 +102,7 @@ export default function ProfilePage() {
                 suggestedCareers: careerSuggestions.suggestions.map(s => s.career),
                 fitScorerPreferences: scores
             });
-            setRecommendations(result);
+            setRecommendations(result.recommendations);
         } catch (error) {
             console.error("Failed to get recommendations:", error);
             toast({
@@ -158,7 +179,7 @@ export default function ProfilePage() {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><ListChecks /> College Fit Scorer</CardTitle>
-                    <CardDescription>Weigh your priorities to find the college that's the perfect fit for you.</CardDescription>
+                    <CardDescription>Adjust your priorities to dynamically re-rank your recommended colleges.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {!careerSuggestions ? (
@@ -185,24 +206,13 @@ export default function ProfilePage() {
                                     />
                                 </div>
                             ))}
-                            <Collapsible>
-                                <CollapsibleTrigger asChild>
-                                    <Button variant="secondary" className="w-full">
-                                        Calculate My Ideal College Fit Score
-                                    </Button>
-                                </CollapsibleTrigger>
-                                <CollapsibleContent className="mt-4 text-center">
-                                    <p className="text-muted-foreground">Your Ideal College Fit Score is</p>
-                                    <p className="text-6xl font-bold text-primary">{calculateFitScore()}%</p>
-                                </CollapsibleContent>
-                            </Collapsible>
                             
                             <Separator />
 
                             <div>
                                 <Button onClick={handleFetchRecommendations} disabled={isLoading} className="w-full">
                                     {isLoading ? <Loader2 className="animate-spin" /> : <GraduationCap />}
-                                    Get Personalized College Recommendations
+                                    {recommendations ? "Refresh Recommendations" : "Get Personalized College Recommendations"}
                                 </Button>
                             </div>
 
@@ -212,28 +222,35 @@ export default function ProfilePage() {
                                 </div>
                             )}
                             
-                            {recommendations && recommendations.recommendations.length > 0 && (
+                            {sortedRecommendations && sortedRecommendations.length > 0 && (
                                 <div className="space-y-4 pt-4">
-                                    <h3 className="text-xl font-semibold">Your Recommended Colleges</h3>
-                                    {recommendations.recommendations.map((rec, index) => {
+                                    <h3 className="text-xl font-semibold">Your Re-Ranked Colleges</h3>
+                                    {sortedRecommendations.map((rec, index) => {
                                         const isSaved = savedColleges.some(c => c.collegeName === rec.collegeName);
+                                        const fitScore = calculateOverallFitScore(rec.attributes);
                                         return (
-                                            <Alert key={index}>
+                                            <Alert key={index} className="relative">
                                                 <div className="flex items-start justify-between">
                                                     <div>
                                                         <GraduationCap className="h-4 w-4" />
                                                         <AlertTitle>{rec.collegeName}</AlertTitle>
                                                         <AlertDescription>{rec.reason}</AlertDescription>
                                                     </div>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => handleSaveCollege(rec)}
-                                                        disabled={isSaved}
-                                                    >
-                                                        {isSaved ? <BookmarkCheck className="text-primary" /> : <Bookmark />}
-                                                        <span className="sr-only">Save College</span>
-                                                    </Button>
+                                                    <div className="flex items-center gap-2">
+                                                      <div className="text-right">
+                                                          <div className="font-bold text-primary text-lg">{fitScore}%</div>
+                                                          <div className="text-xs text-muted-foreground">Fit Score</div>
+                                                      </div>
+                                                      <Button
+                                                          variant="ghost"
+                                                          size="icon"
+                                                          onClick={() => handleSaveCollege(rec)}
+                                                          disabled={isSaved}
+                                                      >
+                                                          {isSaved ? <BookmarkCheck className="text-primary" /> : <Bookmark />}
+                                                          <span className="sr-only">Save College</span>
+                                                      </Button>
+                                                    </div>
                                                 </div>
                                             </Alert>
                                         )
