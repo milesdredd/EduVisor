@@ -142,7 +142,7 @@ export default function CareerDetailPage({ params }: { params: { slug: string } 
     const fetchDetails = async () => {
         setIsLoading(true);
         try {
-            const careerTitle = params.slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            const careerTitle = decodeURIComponent(params.slug).split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             const details = await getCareerDetails({ career: careerTitle });
             setCareer(details);
         } catch (error) {
