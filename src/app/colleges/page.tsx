@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,8 +40,13 @@ function SearchResultSkeleton() {
 }
 
 export default function CollegesPage() {
-  const { savedColleges } = useResultsStore();
+  const store = useResultsStore();
+  const [savedColleges, setSavedColleges] = useState(store.savedColleges);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setSavedColleges(store.savedColleges);
+  }, [store.savedColleges]);
 
   const [location, setLocation] = useState("Mumbai, Maharashtra");
   const [distance, setDistance] = useState(500);

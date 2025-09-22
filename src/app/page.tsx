@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -8,21 +7,27 @@ import { ArrowRight, BarChart2, Lightbulb, TrendingUp, RefreshCw, LayoutDashboar
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function WelcomePage() {
-  const { chosenCareer, reset } = useResultsStore();
+  const store = useResultsStore();
+  const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
   const router = useRouter();
 
+  useEffect(() => {
+    setChosenCareer(store.chosenCareer);
+  }, [store.chosenCareer]);
+
   const handleStartAgain = () => {
-    reset();
+    store.reset();
     router.push('/quiz');
   };
 
   return (
     <div className="flex flex-col">
-      <section className="relative w-full h-[60vh] flex items-center justify-center text-center">
+       <section className="relative w-full h-[60vh] flex items-center justify-center text-center">
         <Image
-            src="/icons/home_bg.jpeg"
+            src="/home_bg.jpeg"
             alt="An inspiring image of a person looking towards a horizon"
             fill
             className="object-cover"

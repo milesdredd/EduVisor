@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useResultsStore } from '@/hooks/use-results-store';
 import Link from 'next/link';
@@ -36,7 +35,13 @@ function LockedDashboardOverlay() {
 
 
 export default function DashboardPage() {
-    const { chosenCareer } = useResultsStore();
+    const store = useResultsStore();
+    const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
+
+    useEffect(() => {
+        setChosenCareer(store.chosenCareer);
+    }, [store.chosenCareer]);
+
     const [syllabusProgress, setSyllabusProgress] = useState<Record<string, boolean>>({
       syllabus1: false,
       syllabus2: false,
@@ -206,5 +211,3 @@ export default function DashboardPage() {
         </div>
     );
 }
-
-    

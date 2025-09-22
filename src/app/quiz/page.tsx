@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { QuizForm } from "@/components/quiz/quiz-form";
@@ -18,16 +18,15 @@ import { Separator } from '@/components/ui/separator';
 
 export default function QuizPage() {
   const router = useRouter();
-  const { careerSuggestions, reset } = useResultsStore();
+  const store = useResultsStore();
+  const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
 
   useEffect(() => {
-    // This effect is for client-side redirection if needed in other scenarios,
-    // but we will render content conditionally based on careerSuggestions.
-  }, [careerSuggestions, router]);
+    setCareerSuggestions(store.careerSuggestions);
+  }, [store.careerSuggestions]);
 
   const handleRetakeQuiz = () => {
-    reset();
-    // No need to push router, the component will re-render to show the quiz form.
+    store.reset();
   };
 
   if (careerSuggestions) {

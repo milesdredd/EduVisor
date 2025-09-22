@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import type { PersonalizedCareerSuggestionsOutput } from '@/ai/flows/personalized-career-suggestions';
 import type { CollegeRecommendationsOutput } from '@/ai/flows/college-recommendations';
 import type { CareerDetailsOutput } from '@/ai/flows/career-details';
+import { useState, useEffect } from 'react';
 
 interface SavedCollege {
   collegeName: string;
@@ -31,7 +32,7 @@ const initialState = {
   savedColleges: [],
 };
 
-export const useResultsStore = create<ResultsState>()(
+const useResultsStoreBase = create<ResultsState>()(
   persist(
     (set) => ({
       ...initialState,
@@ -50,3 +51,14 @@ export const useResultsStore = create<ResultsState>()(
     }
   )
 );
+
+export const useResultsStore = () => {
+  const [hydrated, setHydrated] = useState(false);
+  const store = useResultsStoreBase();
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
+  return hydrated ? store : (initialState as unknown as ResultsState & { reset: () => void; setCareerSuggestions: (s: any) => void; setChosenCareer: (c: any) => void; addSavedCollege: (c: any) => void});
+};

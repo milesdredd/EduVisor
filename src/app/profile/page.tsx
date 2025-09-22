@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -40,9 +40,19 @@ export default function ProfilePage() {
     
     const [isLoading, setIsLoading] = useState(false);
     const [recommendations, setRecommendations] = useState<PersonalizedCollegeSuggestionsOutput | null>(null);
-    const { careerSuggestions, chosenCareer, reset, savedColleges, addSavedCollege } = useResultsStore();
+    const store = useResultsStore();
+    const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
+    const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
+    const [savedColleges, setSavedColleges] = useState(store.savedColleges);
+    
     const { toast } = useToast();
     const router = useRouter();
+
+    useEffect(() => {
+      setCareerSuggestions(store.careerSuggestions);
+      setChosenCareer(store.chosenCareer);
+      setSavedColleges(store.savedColleges);
+    }, [store.careerSuggestions, store.chosenCareer, store.savedColleges]);
     
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
       setScores(prev => ({ ...prev, [category]: value[0] }));
@@ -85,7 +95,7 @@ export default function ProfilePage() {
     };
 
     const handleResetData = () => {
-      reset();
+      store.reset();
       toast({
         title: "Data Cleared",
         description: "Your assessment data has been reset. You can now take the quiz again.",
@@ -94,7 +104,7 @@ export default function ProfilePage() {
     };
 
     const handleSaveCollege = (rec: { collegeName: string; reason: string; }) => {
-        addSavedCollege(rec);
+        store.addSavedCollege(rec);
         toast({
             title: "College Saved!",
             description: `${rec.collegeName} has been added to your list.`,
