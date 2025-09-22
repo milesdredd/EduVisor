@@ -30,7 +30,7 @@ const createSchema = (questions: QuizQuestion[]) => {
     if (q.type === 'radio') {
       acc[q.id] = z.string({ required_error: "Please select an option." });
     } else if (q.type === 'checkbox') {
-      acc[q.id] = z.array(z.string()).min(1, "Please select at least one skill.").max(3, "Please select no more than 3 skills.");
+      acc[q.id] = z.array(z.string()).min(1, "Please select at least one skill.").max(3, "You can only select up to 3 skills.");
     }
     return acc;
   }, {} as Record<string, z.ZodType<any, any>>);
@@ -140,14 +140,14 @@ export function QuizForm() {
                     </RadioGroup>
                   ) : (
                     <div className="space-y-2">
-                      {currentQuestion.options.map((option) => (
+                      {(currentQuestion.options || []).map((option) => (
                         <FormItem key={option} className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 transition-all hover:bg-accent/50 has-[[data-state=checked]]:bg-accent has-[[data-state=checked]]:text-accent-foreground">
                            <FormControl>
                             <Checkbox
-                              checked={(field.value as string[]).includes(option)}
-                              disabled={skillsCount >= 3 && !(field.value as string[]).includes(option)}
+                              checked={(field.value as string[])?.includes(option)}
+                              disabled={skillsCount >= 3 && !(field.value as string[])?.includes(option)}
                               onCheckedChange={(checked) => {
-                                const currentValue = field.value as string[] || [];
+                                const currentValue = (field.value as string[]) || [];
                                 if (checked) {
                                     if (currentValue.length < 3) {
                                         field.onChange([...currentValue, option]);
