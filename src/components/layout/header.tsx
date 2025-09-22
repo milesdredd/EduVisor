@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { LayoutDashboard } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
@@ -11,8 +12,6 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { useResultsStore } from '@/hooks/use-results-store';
-import { Logo } from './logo';
-
 
 export function Header() {
   const { careerSuggestions } = useResultsStore();
@@ -22,7 +21,7 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Logo />
+            <Image src="/logo.png" alt="EduVisor Logo" width={140} height={40} />
           </Link>
           <NavigationMenu>
             <NavigationMenuList>
