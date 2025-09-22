@@ -28,7 +28,7 @@ export default function WelcomePage() {
 
   return (
     <div className="flex flex-col">
-       <section className="relative w-full h-[60vh] flex items-center justify-center text-center">
+      <section className="relative w-full h-[60vh] flex items-center justify-center text-center">
         {heroImage && (
           <Image
               src={heroImage.imageUrl}
