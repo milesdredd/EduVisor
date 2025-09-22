@@ -108,8 +108,6 @@ export function QuizForm() {
   }
 
   const currentQuestion = quizQuestions[currentStep];
-  const skillsValue = form.watch('skills');
-  const skillsCount = Array.isArray(skillsValue) ? skillsValue.length : 0;
 
   return (
     <div className="space-y-8">
@@ -140,27 +138,31 @@ export function QuizForm() {
                     </RadioGroup>
                   ) : (
                     <div className="space-y-2">
-                      {(currentQuestion.options || []).map((option) => (
-                        <FormItem key={option} className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 transition-all hover:bg-accent/50 has-[[data-state=checked]]:bg-accent has-[[data-state=checked]]:text-accent-foreground">
-                           <FormControl>
-                            <Checkbox
-                              checked={(field.value as string[])?.includes(option)}
-                              disabled={skillsCount >= 3 && !(field.value as string[])?.includes(option)}
-                              onCheckedChange={(checked) => {
-                                const currentValue = (field.value as string[]) || [];
-                                if (checked) {
-                                    if (currentValue.length < 3) {
-                                        field.onChange([...currentValue, option]);
-                                    }
-                                } else {
-                                    field.onChange(currentValue.filter(value => value !== option));
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="font-normal">{option}</FormLabel>
-                        </FormItem>
-                      ))}
+                      {(currentQuestion.options || []).map((option) => {
+                        const skillsValue = (form.watch('skills') as string[]) || [];
+                        const skillsCount = skillsValue.length;
+                        return (
+                          <FormItem key={option} className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4 transition-all hover:bg-accent/50 has-[[data-state=checked]]:bg-accent has-[[data-state=checked]]:text-accent-foreground">
+                            <FormControl>
+                              <Checkbox
+                                checked={skillsValue.includes(option)}
+                                disabled={skillsCount >= 3 && !skillsValue.includes(option)}
+                                onCheckedChange={(checked) => {
+                                  const currentValue = skillsValue;
+                                  if (checked) {
+                                      if (currentValue.length < 3) {
+                                          field.onChange([...currentValue, option]);
+                                      }
+                                  } else {
+                                      field.onChange(currentValue.filter(value => value !== option));
+                                  }
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="font-normal">{option}</FormLabel>
+                          </FormItem>
+                        );
+                      })}
                     </div>
                   )}
                 </FormControl>
