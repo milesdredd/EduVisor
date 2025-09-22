@@ -3,7 +3,7 @@
     {
       "id": "pathfinder-hero",
       "description": "An inspiring image of a person looking towards a horizon for the hero section.",
-      "imageUrl": "https://picsum.photos/seed/pathfinder-hero/600/500",
+      "imageUrl": "/icons/home_bg.jpeg",
       "imageHint": "inspiring horizon"
     }
   ]

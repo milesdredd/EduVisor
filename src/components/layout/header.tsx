@@ -21,7 +21,8 @@ export function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Image src="/icons/icon.png" alt="EduVisor Logo" width={70} height={20} />
+            <Image src="/icons/icon.png" alt="EduVisor Logo" width={30} height={30} />
+            <span className="font-bold hidden sm:inline-block">EduVisor</span>
           </Link>
           <NavigationMenu>
             <NavigationMenuList>
