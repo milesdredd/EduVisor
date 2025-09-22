@@ -54,6 +54,11 @@ const timelineEventsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    
+    if (!output?.events) {
+      return { events: [] };
+    }
+
+    return output;
   }
 );
