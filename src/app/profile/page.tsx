@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock } from "lucide-react";
+import { FileText, Briefcase, Building, Bell, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2 } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -14,6 +14,18 @@ import { useResultsStore } from '@/hooks/use-results-store';
 import { getPersonalizedCollegeSuggestions, PersonalizedCollegeSuggestionsOutput } from '@/ai/flows/personalized-college-suggestions';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
     const [scores, setScores] = useState({
@@ -28,8 +40,9 @@ export default function ProfilePage() {
     
     const [isLoading, setIsLoading] = useState(false);
     const [recommendations, setRecommendations] = useState<PersonalizedCollegeSuggestionsOutput | null>(null);
-    const { careerSuggestions, chosenCareer } = useResultsStore();
+    const { careerSuggestions, chosenCareer, reset } = useResultsStore();
     const { toast } = useToast();
+    const router = useRouter();
     
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
       setScores(prev => ({ ...prev, [category]: value[0] }));
@@ -69,6 +82,15 @@ export default function ProfilePage() {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleResetData = () => {
+      reset();
+      toast({
+        title: "Data Cleared",
+        description: "Your assessment data has been reset. You can now take the quiz again.",
+      });
+      router.push('/quiz');
     };
   
   return (
@@ -240,6 +262,39 @@ export default function ProfilePage() {
                 <p className="flex items-center gap-2 text-sm text-muted-foreground"><Building className="w-4 h-4" /> Explored 'IIT Bombay'</p>
             </CardContent>
           </Card>
+
+           <Card>
+            <CardHeader>
+              <CardTitle>Account Settings</CardTitle>
+              <CardDescription>Manage your account and data.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" className="w-full">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Reset My Data
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete your
+                      quiz answers and career suggestions.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetData}>
+                      Yes, reset my data
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </CardContent>
+          </Card>
+
         </div>
       </div>
     </div>
