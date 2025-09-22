@@ -132,7 +132,7 @@ function CareerDetailSkeleton() {
 export default function CareerDetailPage() {
   const [career, setCareer] = useState<CareerDetailsOutput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isCollegesLoading, setIsCollegesLoading] = useState(isCollegesLoading);
+  const [isCollegesLoading, setIsCollegesLoading] = useState(false);
   const [collegeRecommendations, setCollegeRecommendations] = useState<CollegeRecommendationsOutput | null>(null);
   const { toast } = useToast();
   const { chosenCareer, setChosenCareer, addActivity } = useResultsStore();
