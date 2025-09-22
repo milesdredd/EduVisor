@@ -108,6 +108,8 @@ export function QuizForm() {
   }
 
   const currentQuestion = quizQuestions[currentStep];
+  const skillsValue = form.watch('skills');
+  const skillsCount = Array.isArray(skillsValue) ? skillsValue.length : 0;
 
   return (
     <div className="space-y-8">
@@ -143,14 +145,16 @@ export function QuizForm() {
                            <FormControl>
                             <Checkbox
                               checked={(field.value as string[]).includes(option)}
+                              disabled={skillsCount >= 3 && !(field.value as string[]).includes(option)}
                               onCheckedChange={(checked) => {
-                                return checked
-                                  ? field.onChange([...(field.value as string[]), option])
-                                  : field.onChange(
-                                      (field.value as string[]).filter(
-                                        (value) => value !== option
-                                      )
-                                    );
+                                const currentValue = field.value as string[] || [];
+                                if (checked) {
+                                    if (currentValue.length < 3) {
+                                        field.onChange([...currentValue, option]);
+                                    }
+                                } else {
+                                    field.onChange(currentValue.filter(value => value !== option));
+                                }
                               }}
                             />
                           </FormControl>
