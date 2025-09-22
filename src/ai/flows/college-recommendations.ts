@@ -52,6 +52,26 @@ const collegeRecommendationsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+
+    if (!output) {
+      return { collegeRecommendations: [] };
+    }
+    
+    // Programmatic filtering to guarantee only Indian government colleges are returned.
+    const indianGovCollegeKeywords = [
+        'India', 'IIT', 'NIT', 'IIIT', 'Indian Institute', 'National Institute', 'Government College'
+    ];
+
+    const filteredRecommendations = output.collegeRecommendations.filter(rec => 
+        indianGovCollegeKeywords.some(keyword => rec.toLowerCase().includes(keyword.toLowerCase()))
+    );
+
+    // If the filtered list is empty, it means the model didn't return any valid colleges.
+    // Return a user-friendly message in that case.
+    if (filteredRecommendations.length === 0) {
+        return { collegeRecommendations: ["Could not find relevant Indian government colleges for the suggested careers. Please try again or with different quiz answers."] };
+    }
+
+    return { collegeRecommendations: filteredRecommendations };
   }
 );
