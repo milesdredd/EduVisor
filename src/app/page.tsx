@@ -20,21 +20,21 @@ export default function WelcomePage() {
   return (
     <div className="flex flex-col">
       <section className="container mx-auto px-4 py-16 sm:py-20 md:py-28">
-        <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 items-center gap-12">
+          <div className="space-y-6 text-center">
             <h1 className="font-headline text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
               {chosenCareer 
                 ? `Welcome Back! Let's Continue Your Journey.`
                 : `Discover a Career That Aligns With You`
               }
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               {chosenCareer
                 ? `You're on the path to becoming a ${chosenCareer.title}. Your dashboard is ready with personalized resources to guide you.`
                 : `Take our comprehensive assessment to discover career paths that align with your unique strengths and interests. Your future starts now.`
               }
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-4 justify-center">
               {chosenCareer ? (
                 <>
                   <Button asChild size="lg">
@@ -57,16 +57,6 @@ export default function WelcomePage() {
                 </Button>
               )}
             </div>
-          </div>
-          <div className="flex justify-center">
-              <Image
-                src="https://picsum.photos/seed/pathfinder-hero/600/500"
-                alt="An inspiring image of a person looking towards a horizon"
-                width={600}
-                height={500}
-                className="rounded-xl shadow-2xl"
-                data-ai-hint="inspiring horizon"
-              />
           </div>
         </div>
       </section>
