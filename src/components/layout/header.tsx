@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from 'next/link';
@@ -12,9 +13,15 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu"
 import { useResultsStore } from '@/hooks/use-results-store';
+import { useEffect, useState } from 'react';
 
 export function Header() {
   const { careerSuggestions } = useResultsStore();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -33,7 +40,7 @@ export function Header() {
                   </NavigationMenuLink>
                 </Link>
               </NavigationMenuItem>
-              {careerSuggestions && (
+              {isClient && careerSuggestions && (
                  <NavigationMenuItem>
                   <Link href="/dashboard" legacyBehavior passHref>
                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>

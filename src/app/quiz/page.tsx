@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -13,21 +14,31 @@ import {
 } from "@/components/ui/card";
 import { useResultsStore } from '@/hooks/use-results-store';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
 export default function QuizPage() {
   const router = useRouter();
   const store = useResultsStore();
   const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setCareerSuggestions(store.careerSuggestions);
+    setIsClient(true);
   }, [store.careerSuggestions]);
 
   const handleRetakeQuiz = () => {
     store.reset();
   };
+
+  if (!isClient) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   if (careerSuggestions) {
     return (
