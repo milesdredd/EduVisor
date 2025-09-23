@@ -186,6 +186,7 @@ export function TimelineTracker({ career, educationLevel, isLocked = false }: Ti
                                     )}>
                                         <p className="font-bold text-sm uppercase">{format(eventDate, 'MMM')}</p>
                                         <p className="font-bold text-2xl">{format(eventDate, 'dd')}</p>
+                                        <p className="font-bold text-xs">{format(eventDate, 'yyyy')}</p>
                                     </div>
                                     <p className={cn("ml-4 text-sm", status === 'past' && 'line-through text-muted-foreground')}>
                                         {event.title}
