@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, BarChart2, Lightbulb, TrendingUp, RefreshCw, LayoutDashboard } from "lucide-react";
+import { ArrowRight, BarChart2, Lightbulb, TrendingUp, RefreshCw, LayoutDashboard, ClipboardCheck, Compass, GraduationCap } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { useRouter } from "next/navigation";
@@ -71,6 +71,59 @@ export default function WelcomePage() {
                 </Button>
               )}
             </div>
+        </div>
+      </section>
+
+      <section className="w-full bg-background py-20">
+        <div className="container mx-auto text-center">
+          <h2 className="font-headline text-3xl font-bold">How It Works</h2>
+          <p className="text-muted-foreground mt-2 max-w-2xl mx-auto">Your personalized journey to a successful career, simplified in four easy steps.</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 text-left">
+            <Card className="border-primary/20 hover:border-primary transition-all transform hover:scale-105">
+              <CardHeader>
+                <div className="bg-primary/10 text-primary rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                  <ClipboardCheck className="w-6 h-6" />
+                </div>
+                <CardTitle>1. Take the Assessment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Answer a few simple questions to help us understand your interests, skills, and personality.</p>
+              </CardContent>
+            </Card>
+            <Card className="border-primary/20 hover:border-primary transition-all transform hover:scale-105">
+              <CardHeader>
+                 <div className="bg-primary/10 text-primary rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                  <Compass className="w-6 h-6" />
+                </div>
+                <CardTitle>2. Explore Careers</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Receive a curated list of career paths that match your profile, complete with detailed insights.</p>
+              </CardContent>
+            </Card>
+            <Card className="border-primary/20 hover:border-primary transition-all transform hover:scale-105">
+              <CardHeader>
+                 <div className="bg-primary/10 text-primary rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                  <GraduationCap className="w-6 h-6" />
+                </div>
+                <CardTitle>3. Discover Colleges</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Find the best government colleges and universities in India to help you achieve your career goals.</p>
+              </CardContent>
+            </Card>
+             <Card className="border-primary/20 hover:border-primary transition-all transform hover:scale-105">
+              <CardHeader>
+                 <div className="bg-primary/10 text-primary rounded-lg w-12 h-12 flex items-center justify-center mb-4">
+                  <LayoutDashboard className="w-6 h-6" />
+                </div>
+                <CardTitle>4. Use Your Dashboard</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Access your personalized dashboard with study plans, progress trackers, and AI-powered help.</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
