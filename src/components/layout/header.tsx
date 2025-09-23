@@ -27,7 +27,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from '@/components/ui/button';
 
 export function Header() {
-  const { careerSuggestions, chosenCareer, user, logout: storeLogout } = useResultsStore();
+  const { careerSuggestions, chosenCareer, user, logout: storeLogout, reset } = useResultsStore();
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
@@ -39,18 +39,20 @@ export function Header() {
 
   const handleLogout = () => {
     storeLogout();
+    reset();
     router.push('/login');
   }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
-        <div className="flex items-center space-x-4 mr-6">
+        <div className="mr-4 flex items-center">
           <Link href="/" className="flex items-center space-x-2">
             <Image src="/icons/icon.png" alt="EduVisor Logo" width={30} height={30} />
             <span className="font-bold hidden sm:inline-block">EduVisor</span>
           </Link>
-          <NavigationMenu>
+        </div>
+        <NavigationMenu className="flex-1">
             <NavigationMenuList>
               <NavigationMenuItem>
                 <Link href="/quiz" legacyBehavior passHref>
@@ -80,7 +82,6 @@ export function Header() {
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
-        </div>
         
         <div className="flex flex-1 items-center justify-end space-x-4">
           <ThemeToggle />
