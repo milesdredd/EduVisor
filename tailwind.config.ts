@@ -10,9 +10,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        body: ['"JetBrains Mono"', 'sans-serif'],
-        headline: ['"JetBrains Mono"', 'sans-serif'],
-        code: ['"JetBrains Mono"', 'monospace'],
+        body: ['"PT Sans"', 'sans-serif'],
+        headline: ['"PT Sans"', 'sans-serif'],
+        code: ['"PT Sans"', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',
