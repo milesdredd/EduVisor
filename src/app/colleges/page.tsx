@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building, MapPin, Search, Loader2, Star, Milestone, IndianRupee, GraduationCap, Trash2, ShoppingBasket } from "lucide-react";
+import { Building, MapPin, Search, Loader2, Star, Milestone, IndianRupee, GraduationCap, Trash2, ShoppingBasket, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -251,16 +251,22 @@ export default function CollegesPage() {
                       <CardTitle>{college.collegeName}</CardTitle>
                       <CardDescription className="flex items-center gap-2 mt-1"><MapPin size={14}/> {college.location}</CardDescription>
                     </div>
-                    <div className="flex items-center gap-2 text-sm font-bold text-primary">
-                      <Star size={16} className="fill-primary" /> {college.rating.toFixed(1)}
-                    </div>
+                     <Button asChild size="sm">
+                        <a href={college.websiteUrl} target="_blank" rel="noopener noreferrer">
+                            Visit Site <ExternalLink className="ml-2" />
+                        </a>
+                     </Button>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex flex-wrap gap-4 text-sm">
-                    <div className="flex items-center gap-2"><Milestone /> <strong>Distance:</strong> {college.distance} km</div>
-                    <div className="flex items-center gap-2"><IndianRupee /> <strong>Fees:</strong> {college.fees}</div>
-                    <div className="flex items-center gap-2"><GraduationCap /> <strong>Ranking:</strong> {college.ranking}</div>
+                   <div className="flex items-center justify-between flex-wrap gap-x-6 gap-y-2 text-sm border-t pt-4">
+                    <div className="flex items-center gap-2" title="Overall Rating">
+                      <Star size={16} className="fill-primary text-primary" /> 
+                      <span className="font-bold">{college.rating.toFixed(1)}</span>
+                    </div>
+                    <div className="flex items-center gap-2" title="Distance from you"><Milestone /> {college.distance} km</div>
+                    <div className="flex items-center gap-2" title="Approx. annual fees"><IndianRupee /> {college.fees}</div>
+                    <div className="flex items-center gap-2" title="Ranking"><GraduationCap /> {college.ranking}</div>
                   </div>
                   <Alert className="mt-4">
                     <h4 className="font-semibold mb-2">Relevant Courses</h4>
@@ -280,5 +286,3 @@ export default function CollegesPage() {
     </div>
   );
 }
-
-    

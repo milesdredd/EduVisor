@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight } from "lucide-react";
+import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -111,7 +111,7 @@ function CareerDetailSkeleton() {
                      <Button disabled>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Explore Colleges for this Path
                     </Button>
-                </CardContent>.
+                </CardContent>
             </Card>
 
             <Card className="bg-primary/10 border-primary/30">
@@ -365,9 +365,16 @@ export default function CareerDetailPage() {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <ul className="list-disc space-y-2 pl-5 text-muted-foreground">
+                    <ul className="list-none space-y-3">
                     {collegeRecommendations.collegeRecommendations.map((rec, index) => (
-                        <li key={index}>{rec}</li>
+                        <li key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                           <span>{rec.collegeName}</span>
+                           <Button asChild variant="ghost" size="sm">
+                                <a href={rec.websiteUrl} target="_blank" rel="noopener noreferrer">
+                                    Visit Site <ExternalLink className="ml-2" />
+                                </a>
+                           </Button>
+                        </li>
                     ))}
                     </ul>
                 </CardContent>

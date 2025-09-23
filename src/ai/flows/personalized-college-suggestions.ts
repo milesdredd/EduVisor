@@ -47,6 +47,7 @@ const PersonalizedCollegeSuggestionsOutputSchema = z.object({
   recommendations: z.array(
     z.object({
       collegeName: z.string().describe('The full name of the recommended Indian government college.'),
+      websiteUrl: z.string().url().describe('The official website URL of the recommended college.'),
       reason: z
         .string()
         .describe(
@@ -79,9 +80,10 @@ const prompt = ai.definePrompt({
 
 **Your Task:**
 1.  Recommend a list of 4-5 suitable INDIAN GOVERNMENT COLLEGES.
-2.  For each recommendation, provide a brief reason that connects the college to the user's career paths.
-3.  CRITICAL: For each recommended college, you MUST provide a score from 0 to 100 for EACH of the following attributes based on real-world data and reputation: distance (assume a lower score for farther colleges), programs, labs, hostel, cutoffs (academic rigor), placements, and accessibility. These scores should be objective measures of the college's strengths.
-4.  CRITICAL: Verify that each college is a government-funded and operated institution located within India. Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
+2.  For each recommendation, provide the official website URL.
+3.  For each recommendation, provide a brief reason that connects the college to the user's career paths.
+4.  CRITICAL: For each recommended college, you MUST provide a score from 0 to 100 for EACH of the following attributes based on real-world data and reputation: distance (assume a lower score for farther colleges), programs, labs, hostel, cutoffs (academic rigor), placements, and accessibility. These scores should be objective measures of the college's strengths.
+5.  CRITICAL: Verify that each college is a government-funded and operated institution located within India. Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
 `,
 });
 

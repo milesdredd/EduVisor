@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck, LogOut, Search } from "lucide-react";
+import { FileText, Briefcase, Building, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck, LogOut, Search, ExternalLink } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -257,13 +257,17 @@ export default function ProfilePage() {
                                         const fitScore = calculateOverallFitScore(rec.attributes);
                                         return (
                                             <Alert key={index} className="relative">
-                                                <div className="flex items-start justify-between">
+                                                <div className="grid grid-cols-[1fr_auto] items-start gap-4">
                                                     <div>
-                                                        <GraduationCap className="h-4 w-4" />
-                                                        <AlertTitle>{rec.collegeName}</AlertTitle>
+                                                        <AlertTitle className="font-bold">{rec.collegeName}</AlertTitle>
                                                         <AlertDescription>{rec.reason}</AlertDescription>
+                                                         <Button asChild variant="link" className="p-0 h-auto mt-2">
+                                                            <a href={rec.websiteUrl} target="_blank" rel="noopener noreferrer">
+                                                                Visit Website <ExternalLink className="ml-2" />
+                                                            </a>
+                                                        </Button>
                                                     </div>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex flex-col items-end gap-2">
                                                       <div className="text-right">
                                                           <div className="font-bold text-primary text-lg">{fitScore}%</div>
                                                           <div className="text-xs text-muted-foreground">Fit Score</div>
@@ -273,6 +277,7 @@ export default function ProfilePage() {
                                                           size="icon"
                                                           onClick={() => handleSaveCollege(rec)}
                                                           disabled={isSaved}
+                                                          className="h-8 w-8"
                                                       >
                                                           {isSaved ? <BookmarkCheck className="text-primary" /> : <Bookmark />}
                                                           <span className="sr-only">Save College</span>

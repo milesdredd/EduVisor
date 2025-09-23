@@ -23,6 +23,7 @@ const SearchCollegesOutputSchema = z.object({
   colleges: z.array(
     z.object({
       collegeName: z.string().describe('The full name of the Indian government college.'),
+      websiteUrl: z.string().url().describe('The official website URL of the college.'),
       location: z.string().describe('The city and state where the college is located.'),
       distance: z.number().describe('The approximate distance in kilometers from the user.'),
       ranking: z.string().describe('A notable ranking of the college (e.g., "NIRF #3").'),
@@ -53,12 +54,13 @@ Sort By: {{{sortBy}}}
 
 **Instructions:**
 1.  Generate a list of 5-7 Indian government colleges that match the user's query.
-2.  All information (fees, rankings) must be relevant to India.
-3.  Calculate the approximate distance from the user's location.
-4.  Provide a realistic overall rating out of 5.
-5.  If a stream is provided, list courses relevant to that stream.
-6.  CRITICAL: ONLY include government-funded colleges. Do NOT include any private universities.
-7.  Sort the final list according to the user's 'sortBy' preference.
+2.  For each college, provide its official website URL.
+3.  All information (fees, rankings) must be relevant to India.
+4.  Calculate the approximate distance from the user's location.
+5.  Provide a realistic overall rating out of 5.
+6.  If a stream is provided, list courses relevant to that stream.
+7.  CRITICAL: ONLY include government-funded colleges. Do NOT include any private universities.
+8.  Sort the final list according to the user's 'sortBy' preference.
 `,
 });
 

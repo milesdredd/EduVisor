@@ -20,9 +20,14 @@ export type CollegeRecommendationsInput = z.infer<
   typeof CollegeRecommendationsInputSchema
 >;
 
+const CollegeRecommendationSchema = z.object({
+    collegeName: z.string().describe('The name of the potential college and its relevant educational track.'),
+    websiteUrl: z.string().url().describe('The official website URL of the college.')
+});
+
 const CollegeRecommendationsOutputSchema = z.object({
-  collegeRecommendations: z.array(z.string()).describe(
-    'A list of potential colleges and educational tracks based on the suggested careers.'
+  collegeRecommendations: z.array(CollegeRecommendationSchema).describe(
+    'A list of potential colleges, their educational tracks, and official websites based on the suggested careers.'
   ),
 });
 export type CollegeRecommendationsOutput = z.infer<
@@ -41,13 +46,14 @@ const prompt = ai.definePrompt({
   output: {schema: CollegeRecommendationsOutputSchema},
   prompt: `You are an expert career counselor for students in India. Your task is to recommend ONLY Indian government colleges.
 
-Based on the following suggested careers: {{suggestedCareers}}, recommend a list of potential Indian government colleges and their relevant educational tracks.
+Based on the following suggested careers: {{suggestedCareers}}, recommend a list of potential Indian government colleges, their relevant educational tracks, and their official website URLs.
 
 Follow these steps:
 1.  Identify a potential college and its relevant program for the given careers.
-2.  CRITICAL: Verify if the college is a government-funded and operated institution located within India.
-3.  If and ONLY IF the college is an Indian government college, add it to the list.
-4.  Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
+2.  Find the official, valid website URL for that college.
+3.  CRITICAL: Verify if the college is a government-funded and operated institution located within India.
+4.  If and ONLY IF the college is an Indian government college, add it to the list with its name and official URL.
+5.  Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
 `,
 });
 
@@ -61,7 +67,7 @@ const collegeRecommendationsFlow = ai.defineFlow(
     const {output} = await prompt(input);
 
     if (!output || !output.collegeRecommendations) {
-      return { collegeRecommendations: ["Could not generate college recommendations at this time. Please try again later."] };
+      return { collegeRecommendations: [] };
     }
     
     // Programmatic filtering to GUARANTEE only Indian government colleges are returned.
@@ -70,14 +76,9 @@ const collegeRecommendationsFlow = ai.defineFlow(
     ];
 
     const filteredRecommendations = output.collegeRecommendations.filter(rec => {
-        const lowerCaseRec = rec.toLowerCase();
+        const lowerCaseRec = rec.collegeName.toLowerCase();
         return indianGovCollegeKeywords.some(keyword => lowerCaseRec.includes(keyword));
     });
-
-    // If the filtered list is empty, it means the model didn't return any valid colleges.
-    if (filteredRecommendations.length === 0) {
-        return { collegeRecommendations: ["Could not find relevant Indian government colleges for the suggested careers. Please try again or with different quiz answers."] };
-    }
 
     return { collegeRecommendations: filteredRecommendations };
   }
