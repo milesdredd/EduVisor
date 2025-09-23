@@ -11,3 +11,4 @@ import '@/ai/flows/dashboard-details.ts';
 import '@/ai/flows/more-resources.ts';
 import '@/ai/flows/study-plan.ts';
 import '@/ai/flows/ask-tutor.ts';
+import '@/ai/flows/find-mentors.ts';

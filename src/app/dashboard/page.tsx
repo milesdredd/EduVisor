@@ -10,12 +10,24 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock, Loader2, CalendarDays } from 'lucide-react';
+import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock, Loader2, CalendarDays, Linkedin } from 'lucide-react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { TimelineTracker } from '@/components/dashboard/timeline-tracker';
 import { getDashboardDetails, DashboardDetailsOutput } from '@/ai/flows/dashboard-details';
+import { findMentors, FindMentorsOutput } from '@/ai/flows/find-mentors';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 function LockedDashboardOverlay() {
     return (
@@ -104,6 +116,10 @@ export default function DashboardPage() {
     const [details, setDetails] = useState<DashboardDetailsOutput | null>(null);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
 
+    const [isMentorLoading, setIsMentorLoading] = useState(false);
+    const [mentors, setMentors] = useState<FindMentorsOutput | null>(null);
+    const [isMentorDialogOpen, setIsMentorDialogOpen] = useState(false);
+
     const isLocked = !chosenCareer && !careerSuggestions;
     const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
 
@@ -153,6 +169,26 @@ export default function DashboardPage() {
     const handleSyllabusChange = (id: string, checked: CheckedState) => {
         setSyllabusProgress(prev => ({ ...prev, [id]: !!checked }));
     };
+    
+    const handleFindMentors = async () => {
+        if (!chosenCareer) return;
+        setIsMentorLoading(true);
+        setMentors(null);
+        try {
+            const results = await findMentors({ career: chosenCareer.title });
+            setMentors(results);
+        } catch(e) {
+            console.error(e);
+            toast({
+                variant: 'destructive',
+                title: 'Error finding mentors',
+                description: 'Could not fetch mentor suggestions at this time.',
+            });
+        } finally {
+            setIsMentorLoading(false);
+        }
+    };
+
 
     const overallProgress = details?.syllabus?.length
       ? Math.round((Object.values(syllabusProgress).filter(Boolean).length / details.syllabus.length) * 100)
@@ -331,10 +367,57 @@ export default function DashboardPage() {
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2"><Users /> Talk to a Mentor</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground">Connect with industry professionals.</p>
-                                <Badge variant="outline" className="mt-2">Coming Soon</Badge>
+                             <CardContent>
+                                <p className="text-muted-foreground">Connect with industry professionals in India.</p>
                             </CardContent>
+                            <CardFooter>
+                               <AlertDialog open={isMentorDialogOpen} onOpenChange={setIsMentorDialogOpen}>
+                                    <AlertDialogTrigger asChild>
+                                        <Button className="w-full" disabled={isLocked || !chosenCareer} onClick={handleFindMentors}>
+                                            Find Mentors
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Mentors for {chosenCareer?.title}</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                Here are some established professionals in your field. Consider reaching out to them for guidance.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <div className="max-h-[60vh] overflow-y-auto p-1">
+                                            {isMentorLoading ? (
+                                                <div className="flex justify-center items-center h-32">
+                                                    <Loader2 className="animate-spin text-primary" />
+                                                </div>
+                                            ) : mentors && mentors.mentors.length > 0 ? (
+                                                <div className="space-y-4">
+                                                    {mentors.mentors.map((mentor, i) => (
+                                                        <div key={i} className="flex items-start gap-4 p-3 border rounded-lg">
+                                                            <div className="flex-shrink-0 h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                                                                <Users className="w-5 h-5 text-muted-foreground" />
+                                                            </div>
+                                                            <div className="flex-grow">
+                                                                <p className="font-semibold">{mentor.name}</p>
+                                                                <p className="text-sm text-muted-foreground">{mentor.description}</p>
+                                                            </div>
+                                                            <Button asChild variant="ghost" size="sm">
+                                                                <a href={mentor.profileUrl} target="_blank" rel="noopener noreferrer">
+                                                                    <Linkedin />
+                                                                </a>
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <p className="text-center text-sm text-muted-foreground py-8">Could not find any mentors at this time.</p>
+                                            )}
+                                        </div>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Close</AlertDialogCancel>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
+                            </CardFooter>
                         </Card>
                     </div>
                 </div>
