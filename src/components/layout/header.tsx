@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { LayoutDashboard } from 'lucide-react';
+import { LayoutDashboard, Book, BrainCircuit } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
   NavigationMenu,
@@ -16,12 +16,14 @@ import { useResultsStore } from '@/hooks/use-results-store';
 import { useEffect, useState } from 'react';
 
 export function Header() {
-  const { careerSuggestions } = useResultsStore();
+  const { careerSuggestions, chosenCareer } = useResultsStore();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  const showDashboardLinks = isClient && (careerSuggestions || chosenCareer);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -34,35 +36,45 @@ export function Header() {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/quiz">
+                <Link href="/quiz" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Assessment
-                  </Link>
-                </NavigationMenuLink>
-              </NavigationMenuItem>
-              {isClient && careerSuggestions && (
-                 <NavigationMenuItem>
-                  <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                    <Link href="/dashboard">
-                      <LayoutDashboard className="mr-2" />
-                      Dashboard
-                    </Link>
                   </NavigationMenuLink>
-                </NavigationMenuItem>
+                </Link>
+              </NavigationMenuItem>
+              {showDashboardLinks && (
+                 <>
+                    <NavigationMenuItem>
+                        <Link href="/dashboard" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            <LayoutDashboard className="mr-2" />
+                            Dashboard
+                        </NavigationMenuLink>
+                        </Link>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                        <Link href={`/study-planner?career=${encodeURIComponent(chosenCareer?.title || '')}`} legacyBehavior passHref>
+                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                                <BrainCircuit className="mr-2" />
+                                Study Planner
+                            </NavigationMenuLink>
+                        </Link>
+                    </NavigationMenuItem>
+                 </>
               )}
               <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/colleges">
+                <Link href="/colleges" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Colleges
-                  </Link>
-                </NavigationMenuLink>
+                  </NavigationMenuLink>
+                </Link>
               </NavigationMenuItem>
                <NavigationMenuItem>
-                <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
-                  <Link href="/profile">
+                <Link href="/profile" legacyBehavior passHref>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Profile
-                  </Link>
-                </NavigationMenuLink>
+                  </NavigationMenuLink>
+                </Link>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>

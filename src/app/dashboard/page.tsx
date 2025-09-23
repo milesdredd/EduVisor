@@ -319,8 +319,10 @@ export default function DashboardPage() {
                                 <p className="text-muted-foreground">Get a personalized timetable, find answers to complex questions, and more.</p>
                             </CardContent>
                             <CardFooter>
-                                <Button className="w-full" disabled={isLocked}>
-                                    Create My Study Plan <ArrowRight className="ml-2"/>
+                                <Button asChild className="w-full" disabled={isLocked || !chosenCareer}>
+                                    <Link href={`/study-planner?career=${encodeURIComponent(chosenCareer?.title || '')}`}>
+                                        Create My Study Plan <ArrowRight className="ml-2"/>
+                                    </Link>
                                 </Button>
                             </CardFooter>
                         </Card>
