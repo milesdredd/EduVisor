@@ -135,7 +135,7 @@ export default function CareerDetailPage() {
   const [isCollegesLoading, setIsCollegesLoading] = useState(false);
   const [collegeRecommendations, setCollegeRecommendations] = useState<CollegeRecommendationsOutput | null>(null);
   const { toast } = useToast();
-  const { chosenCareer, setChosenCareer, addActivity } = useResultsStore();
+  const { chosenCareer, setChosenCareer, addActivity, quizAnswers } = useResultsStore();
   const isCareerChosen = chosenCareer?.title === career?.title;
   const params = useParams<{ slug: string }>();
 
@@ -167,10 +167,24 @@ export default function CareerDetailPage() {
   
   const handleFetchRecommendations = async () => {
     if (!career) return;
+
+    const educationLevel = quizAnswers?.educationLevel as string;
+    if (!educationLevel) {
+        toast({
+            variant: "destructive",
+            title: "Quiz not taken",
+            description: "Please take the assessment quiz to get college recommendations.",
+        });
+        return;
+    }
+
     setIsCollegesLoading(true);
     setCollegeRecommendations(null); 
     try {
-      const recommendations = await getCollegeRecommendations({ suggestedCareers: [career.title] });
+      const recommendations = await getCollegeRecommendations({ 
+          suggestedCareers: [career.title],
+          educationLevel: educationLevel,
+      });
       setCollegeRecommendations(recommendations);
     } catch (error) {
       console.error(error);
@@ -262,9 +276,11 @@ export default function CareerDetailPage() {
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Are you ready to commit to this path?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            <div className="italic text-center my-4">"The future depends on what you do today." - Mahatma Gandhi</div>
-                            This action will set '{career.title}' as your chosen career path. You can always explore and change your path later. 😉
+                          <AlertDialogDescription asChild>
+                            <div>
+                                <div className="italic text-center my-4">"The future depends on what you do today." - Mahatma Gandhi</div>
+                                This action will set '{career.title}' as your chosen career path. You can always explore and change your path later. 😉
+                            </div>
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

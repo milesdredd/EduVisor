@@ -15,6 +15,9 @@ const CollegeRecommendationsInputSchema = z.object({
   suggestedCareers: z
     .array(z.string())
     .describe('A list of suggested careers for the student.'),
+  educationLevel: z
+    .string()
+    .describe("The user's current education level (e.g., 'Completed Class 12', 'Undergraduate')."),
 });
 export type CollegeRecommendationsInput = z.infer<
   typeof CollegeRecommendationsInputSchema
@@ -46,14 +49,17 @@ const prompt = ai.definePrompt({
   output: {schema: CollegeRecommendationsOutputSchema},
   prompt: `You are an expert career counselor for students in India. Your task is to recommend ONLY Indian government colleges.
 
-Based on the following suggested careers: {{suggestedCareers}}, recommend a list of potential Indian government colleges, their relevant educational tracks, and their official website URLs.
+The user's current education level is: {{{educationLevel}}}.
+Based on the following suggested careers: {{suggestedCareers}}, recommend a list of potential Indian government colleges and their relevant educational tracks.
 
 Follow these steps:
 1.  Identify a potential college and its relevant program for the given careers.
-2.  Find the official, valid website URL for that college.
-3.  CRITICAL: Verify if the college is a government-funded and operated institution located within India.
-4.  If and ONLY IF the college is an Indian government college, add it to the list with its name and official URL.
-5.  Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
+2.  If the user's education level is 'Completed Class 12', suggest relevant UNDERGRADUATE programs (e.g., B.Tech, B.Sc.).
+3.  If the user's education level is 'Undergraduate', suggest relevant POSTGRADUATE programs (e.g., M.Tech, M.Sc., MBA).
+4.  Find the official, valid website URL for that college.
+5.  CRITICAL: Verify if the college is a government-funded and operated institution located within India.
+6.  If and ONLY IF the college is an Indian government college, add it to the list with its name, a RELEVANT degree track, and official URL.
+7.  Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
 `,
 });
 

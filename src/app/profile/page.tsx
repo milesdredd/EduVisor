@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -57,6 +56,7 @@ export default function ProfilePage() {
     const [savedColleges, setSavedColleges] = useState(store.savedColleges);
     const [user, setUser] = useState(store.user);
     const [activityLog, setActivityLog] = useState(store.activityLog);
+    const [quizAnswers, setQuizAnswers] = useState(store.quizAnswers);
     
     const { toast } = useToast();
     const router = useRouter();
@@ -70,6 +70,7 @@ export default function ProfilePage() {
             setSavedColleges(state.savedColleges);
             setUser(state.user);
             setActivityLog(state.activityLog);
+            setQuizAnswers(state.quizAnswers);
         });
         return () => unsub();
     }, []);
@@ -112,12 +113,23 @@ export default function ProfilePage() {
             return;
         }
 
+        const educationLevel = quizAnswers?.educationLevel as string;
+        if (!educationLevel) {
+            toast({
+                variant: "destructive",
+                title: "Quiz Error",
+                description: "Could not determine your education level from the quiz. Please retake it.",
+            });
+            return;
+        }
+
         setIsLoading(true);
         setRecommendations(null);
 
         try {
             const result = await getPersonalizedCollegeSuggestions({
                 suggestedCareers: careerSuggestions.suggestions.map(s => s.career),
+                educationLevel: educationLevel,
                 fitScorerPreferences: scores
             });
             setRecommendations(result.recommendations);
