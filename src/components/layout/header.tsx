@@ -51,30 +51,26 @@ export function Header() {
 
   const navLinks = (
     <>
-      <Link href="/quiz" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-          Assessment
-          </NavigationMenuLink>
-      </Link>
+      <SheetClose asChild>
+        <Link href="/quiz" className="flex items-center gap-2 text-lg font-medium">Assessment</Link>
+      </SheetClose>
       {showDashboardLinks && (
-        <Link href="/dashboard" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              <LayoutDashboard className="mr-2" />
-              Dashboard
-          </NavigationMenuLink>
-        </Link>
+        <SheetClose asChild>
+          <Link href="/dashboard" className="flex items-center gap-2 text-lg font-medium">
+            <LayoutDashboard className="h-5 w-5" />
+            Dashboard
+          </Link>
+        </SheetClose>
       )}
-      <Link href="/colleges" legacyBehavior passHref>
-          <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-          Colleges
-          </NavigationMenuLink>
-      </Link>
+      <SheetClose asChild>
+      <Link href="/colleges" className="flex items-center gap-2 text-lg font-medium">Colleges</Link>
+      </SheetClose>
     </>
   );
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center space-x-2">
             <Image src="/icons/icon.png" alt="EduVisor Logo" width={30} height={30} />
@@ -82,11 +78,11 @@ export function Header() {
           </Link>
         </div>
 
-        <div className="hidden md:flex">
+        <div className="mx-auto hidden md:flex">
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
-                  <Link href="/quiz" legacyBehavior passHref>
+                  <Link href="/quiz" legacyBehavior={false} passHref>
                       <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                       Assessment
                       </NavigationMenuLink>
@@ -95,7 +91,7 @@ export function Header() {
                 {showDashboardLinks && (
                 <>
                     <NavigationMenuItem>
-                        <Link href="/dashboard" legacyBehavior passHref>
+                        <Link href="/dashboard" legacyBehavior={false} passHref>
                         <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                             <LayoutDashboard className="mr-2 h-4 w-4" />
                             Dashboard
@@ -105,7 +101,7 @@ export function Header() {
                 </>
                 )}
                 <NavigationMenuItem>
-                <Link href="/colleges" legacyBehavior passHref>
+                <Link href="/colleges" legacyBehavior={false} passHref>
                     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                     Colleges
                     </NavigationMenuLink>
@@ -162,20 +158,7 @@ export function Header() {
                 </SheetTrigger>
                 <SheetContent side="left">
                     <div className="flex flex-col gap-4 py-8">
-                       <SheetClose asChild>
-                         <Link href="/quiz" className="flex items-center gap-2 text-lg font-medium">Assessment</Link>
-                       </SheetClose>
-                        {showDashboardLinks && (
-                          <SheetClose asChild>
-                            <Link href="/dashboard" className="flex items-center gap-2 text-lg font-medium">
-                              <LayoutDashboard className="h-5 w-5" />
-                              Dashboard
-                            </Link>
-                          </SheetClose>
-                        )}
-                       <SheetClose asChild>
-                        <Link href="/colleges" className="flex items-center gap-2 text-lg font-medium">Colleges</Link>
-                       </SheetClose>
+                       {navLinks}
                     </div>
                 </SheetContent>
             </Sheet>
