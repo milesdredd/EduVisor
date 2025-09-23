@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -10,6 +11,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { isPast, parseISO, addYears } from 'date-fns';
 
 const TimelineEventsInputSchema = z.object({
   career: z.string().describe('The chosen career path.'),
@@ -62,8 +64,11 @@ Based on the chosen career path of {{{career}}} and the user's education level o
 - If education level is 'Completed Class 12' or similar, focus on UNDERGRADUATE entrance exams.
 - If education level is 'Undergraduate', focus on POSTGRADUATE entrance exams (e.g., CAT, GATE).
 
-CRITICAL: Use the current year for dates and format the date STRICTLY as 'YYYY-MM-DD'.
-Only include events that are highly relevant to the specified career and education level.
+**CRITICAL Instructions:**
+1.  **Use Future Dates:** All dates MUST be in the future.
+2.  **Recurring Events:** For major annual exams (like JEE, NEET, CAT, GATE, etc.), if the exact date for the next cycle is not yet announced, you MUST estimate a realistic date for the **next year** based on historical patterns (e.g., if JEE Main is usually in January, provide a date in January of next year). Do not use past dates.
+3.  **Date Format:** Format the date STRICTLY as 'YYYY-MM-DD'.
+4.  **Relevance:** Only include events that are highly relevant to the specified career and education level.
 `,
 });
 
@@ -80,6 +85,23 @@ const timelineEventsFlow = ai.defineFlow(
       return {events: []};
     }
 
-    return output;
+    const upcomingEvents = output.events.map(event => {
+        try {
+            let eventDate = parseISO(event.date);
+            // If the event date is in the past, assume it's a recurring annual event and move it to next year.
+            if (isPast(eventDate)) {
+                eventDate = addYears(eventDate, 1);
+            }
+            return {
+                ...event,
+                date: eventDate.toISOString().split('T')[0], // Format back to 'YYYY-MM-DD'
+            };
+        } catch (e) {
+            return null; // Exclude if date is invalid
+        }
+    }).filter((event): event is Exclude<typeof event, null> => event !== null);
+
+
+    return { events: upcomingEvents };
   }
 );

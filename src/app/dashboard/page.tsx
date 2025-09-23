@@ -10,13 +10,23 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock, Loader2, CalendarDays, Linkedin } from 'lucide-react';
+import { Compass, BookOpen, Newspaper, Target, Bot, Users, ArrowRight, Lock, Loader2, CalendarDays, Linkedin, PlusCircle, Trash2 } from 'lucide-react';
 import type { CheckedState } from '@radix-ui/react-checkbox';
 import { TimelineTracker } from '@/components/dashboard/timeline-tracker';
 import { getDashboardDetails, DashboardDetailsOutput } from '@/ai/flows/dashboard-details';
 import { findMentors, FindMentorsOutput } from '@/ai/flows/find-mentors';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +38,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 function LockedDashboardOverlay() {
     return (
@@ -44,8 +57,8 @@ function LockedDashboardOverlay() {
 
 function DashboardSkeleton() {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
@@ -80,7 +93,7 @@ function DashboardSkeleton() {
                     </CardContent>
                 </Card>
             </div>
-            <div className="space-y-8">
+            <div className="space-y-6">
                 <Card>
                     <CardHeader>
                         <CardTitle>Overall Progress</CardTitle>
@@ -109,39 +122,37 @@ function DashboardSkeleton() {
 
 export default function DashboardPage() {
     const store = useResultsStore();
-    const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
-    const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
-    const [quizAnswers, setQuizAnswers] = useState(store.quizAnswers);
-
     const { toast } = useToast();
+    
+    const { 
+      chosenCareer, 
+      careerSuggestions, 
+      quizAnswers, 
+      dashboardDetails, 
+      setDashboardDetails,
+      addSyllabusItem,
+      removeSyllabusItem,
+      toggleSyllabusCompletion,
+      syllabusProgress,
+    } = store;
 
-    const [details, setDetails] = useState<DashboardDetailsOutput | null>(null);
     const [isLoadingDetails, setIsLoadingDetails] = useState(false);
-
     const [isMentorLoading, setIsMentorLoading] = useState(false);
     const [mentors, setMentors] = useState<FindMentorsOutput | null>(null);
     const [isMentorDialogOpen, setIsMentorDialogOpen] = useState(false);
+    const [newMilestone, setNewMilestone] = useState('');
 
     const isLocked = !chosenCareer && !careerSuggestions;
     const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
     const educationLevel = quizAnswers?.educationLevel as string | undefined;
 
     useEffect(() => {
-        const unsub = useResultsStore.subscribe((state) => {
-            setChosenCareer(state.chosenCareer);
-            setCareerSuggestions(state.careerSuggestions);
-            setQuizAnswers(state.quizAnswers);
-        });
-        return () => unsub();
-    }, []);
-
-    useEffect(() => {
-        if (chosenCareer) {
+        if (chosenCareer && !dashboardDetails) {
             const fetchDetails = async () => {
                 setIsLoadingDetails(true);
                 try {
                     const result = await getDashboardDetails({ career: chosenCareer.title });
-                    setDetails(result);
+                    setDashboardDetails(result);
                 } catch (error) {
                     console.error("Failed to fetch dashboard details:", error);
                     toast({
@@ -155,24 +166,7 @@ export default function DashboardPage() {
             };
             fetchDetails();
         }
-    }, [chosenCareer, toast]);
-
-    const [syllabusProgress, setSyllabusProgress] = useState<Record<string, boolean>>({});
-
-    useEffect(() => {
-        if (details?.syllabus) {
-            const initialProgress = details.syllabus.reduce((acc, item) => {
-                acc[item.id] = false;
-                return acc;
-            }, {} as Record<string, boolean>);
-            setSyllabusProgress(initialProgress);
-        }
-    }, [details]);
-
-
-    const handleSyllabusChange = (id: string, checked: CheckedState) => {
-        setSyllabusProgress(prev => ({ ...prev, [id]: !!checked }));
-    };
+    }, [chosenCareer, dashboardDetails, setDashboardDetails, toast]);
     
     const handleFindMentors = async () => {
         if (!chosenCareer) return;
@@ -192,16 +186,25 @@ export default function DashboardPage() {
             setIsMentorLoading(false);
         }
     };
+    
+    const handleAddMilestone = () => {
+      if(newMilestone.trim()) {
+        addSyllabusItem(newMilestone);
+        setNewMilestone('');
+        toast({ title: 'Milestone Added!', description: `'${newMilestone}' has been added to your syllabus.` });
+      }
+    }
 
-
-    const overallProgress = details?.syllabus?.length
-      ? Math.round((Object.values(syllabusProgress).filter(Boolean).length / details.syllabus.length) * 100)
+    const totalSyllabusItems = dashboardDetails?.syllabus?.length || 0;
+    const completedSyllabusItems = Object.values(syllabusProgress).filter(Boolean).length;
+    const overallProgress = totalSyllabusItems > 0
+      ? Math.round((completedSyllabusItems / totalSyllabusItems) * 100)
       : 0;
     
-    const showDashboardContent = chosenCareer && !isLoadingDetails && details;
+    const showDashboardContent = chosenCareer && !isLoadingDetails && dashboardDetails;
     
     return (
-        <div className="container mx-auto py-12 space-y-8">
+        <div className="container mx-auto py-12 space-y-6">
 
             <div className="text-center space-y-2">
                 <p className="text-lg text-muted-foreground">"The best way to predict the future is to create it."</p>
@@ -241,40 +244,83 @@ export default function DashboardPage() {
                 {isLocked && <LockedDashboardOverlay />}
 
                 {(isLoadingDetails && !isLocked) ? <DashboardSkeleton /> : (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-8">
+                    <div className="lg:col-span-2 space-y-6">
                         <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
-                                <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
+                            <CardHeader className="flex flex-row items-center justify-between">
+                                <div>
+                                    <CardTitle className="flex items-center gap-2"><Target /> Syllabus & Milestones</CardTitle>
+                                    <CardDescription>Track your progress through the required subjects and skills.</CardDescription>
+                                </div>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <Button variant="ghost" size="icon" disabled={isLocked || !showDashboardContent}>
+                                            <PlusCircle />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Add a new milestone</DialogTitle>
+                                            <DialogDescription>
+                                                Add a custom topic or goal to your syllabus.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-4 py-4">
+                                            <Label htmlFor="milestone-name">Milestone Name</Label>
+                                            <Input
+                                                id="milestone-name"
+                                                value={newMilestone}
+                                                onChange={(e) => setNewMilestone(e.target.value)}
+                                                placeholder="e.g., Master React Hooks"
+                                            />
+                                        </div>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button type="button" onClick={handleAddMilestone}>Add Milestone</Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                {showDashboardContent && details?.syllabus?.length ? (
-                                    <div className="space-y-3">
-                                        {details.syllabus.map(item => (
-                                            <div key={item.id} className="flex items-center">
-                                                <Checkbox
-                                                    id={item.id}
-                                                    checked={!isLocked && syllabusProgress[item.id]}
-                                                    onCheckedChange={(checked) => handleSyllabusChange(item.id, checked)}
-                                                    disabled={isLocked}
-                                                    className="mr-3"
-                                                />
-                                                <label
-                                                    htmlFor={item.id}
-                                                    className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
-                                                        syllabusProgress[item.id] && !isLocked ? 'line-through text-muted-foreground' : ''
-                                                    }`}
-                                                >
-                                                    {item.label}
-                                                </label>
-                                            </div>
-                                        ))}
-                                    </div>
+                            <CardContent>
+                                {showDashboardContent && dashboardDetails?.syllabus?.length ? (
+                                    <ScrollArea className="h-72">
+                                        <div className="space-y-1 pr-4">
+                                            {dashboardDetails.syllabus.map(item => (
+                                                <div key={item.id} className="group flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                                                    <div className="flex items-center flex-grow cursor-pointer">
+                                                        <Checkbox
+                                                            id={item.id}
+                                                            checked={syllabusProgress[item.id] || false}
+                                                            onCheckedChange={(checked) => toggleSyllabusCompletion(item.id, !!checked)}
+                                                            disabled={isLocked}
+                                                            className="mr-3"
+                                                        />
+                                                        <Label
+                                                            htmlFor={item.id}
+                                                            className={`flex-grow text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${
+                                                                syllabusProgress[item.id] && !isLocked ? 'line-through text-muted-foreground' : ''
+                                                            }`}
+                                                        >
+                                                            {item.label}
+                                                        </Label>
+                                                    </div>
+                                                     <Button 
+                                                        variant="ghost" 
+                                                        size="icon" 
+                                                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/10"
+                                                        onClick={() => removeSyllabusItem(item.id)}
+                                                        >
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </ScrollArea>
                                 ) : (
-                                    <p className="text-sm text-muted-foreground">
-                                        {chosenCareer ? 'No syllabus available for this career path yet.' : 'Choose a career to get started.'}
+                                    <p className="text-sm text-muted-foreground text-center py-4">
+                                        {chosenCareer ? 'No syllabus available. Add your first milestone!' : 'Choose a career to get started.'}
                                     </p>
                                 )}
                             </CardContent>
@@ -286,8 +332,8 @@ export default function DashboardPage() {
                                 <CardDescription>Curated books and articles to get you started.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-3">
-                                {showDashboardContent && details?.resources?.length ? (
-                                    details.resources.map((res, index) => (
+                                {showDashboardContent && dashboardDetails?.resources?.length ? (
+                                    dashboardDetails.resources.map((res, index) => (
                                         <div key={index} className="flex items-start gap-3">
                                             <div className="bg-secondary p-2 rounded-full">
                                                <BookOpen className="w-4 h-4 text-secondary-foreground"/>
@@ -299,7 +345,7 @@ export default function DashboardPage() {
                                         </div>
                                     ))
                                 ) : (
-                                     <p className="text-sm text-muted-foreground">
+                                     <p className="text-sm text-muted-foreground text-center py-4">
                                         {chosenCareer ? 'No resources available for this career path yet.' : 'Choose a career to get started.'}
                                      </p>
                                 )}
@@ -319,15 +365,15 @@ export default function DashboardPage() {
                                 <CardDescription>Stay updated with what's happening in the world of {chosenCareer ? chosenCareer.title : "your future career"}.</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
-                                {showDashboardContent && details?.news?.length ? (
-                                    details.news.map((item, index) => (
+                                {showDashboardContent && dashboardDetails?.news?.length ? (
+                                    dashboardDetails.news.map((item, index) => (
                                         <div key={index}>
                                             <p className="font-medium">{item.headline}</p>
                                             <p className="text-sm text-muted-foreground">{item.summary}</p>
                                         </div>
                                     ))
                                 ) : (
-                                     <p className="text-sm text-muted-foreground">
+                                     <p className="text-sm text-muted-foreground text-center py-4">
                                         {chosenCareer ? 'No news available for this career path yet.' : 'Choose a career to get started.'}
                                      </p>
                                 )}
@@ -336,7 +382,7 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Right Column */}
-                    <div className="space-y-8">
+                    <div className="space-y-6">
                         <Card>
                             <CardHeader>
                                 <CardTitle>Overall Progress</CardTitle>
@@ -430,3 +476,5 @@ export default function DashboardPage() {
         </div>
     );
 }
+
+    

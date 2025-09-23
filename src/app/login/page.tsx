@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { useResultsStore } from "@/hooks/use-results-store";
 import Image from "next/image";
 import { ArrowRight, Bot } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const formSchema = z.object({
   username: z.string().min(2, "Username must be at least 2 characters."),
@@ -62,7 +63,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-muted/40 p-4">
+        <div className="absolute top-4 right-4">
+            <ThemeToggle />
+        </div>
         <div className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
              <div className="text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start gap-4 mb-4">

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -38,6 +39,21 @@ const iconMap = {
 };
 
 export default function ProfilePage() {
+    const store = useResultsStore();
+    const router = useRouter();
+    const { toast } = useToast();
+    
+    const {
+      careerSuggestions,
+      chosenCareer,
+      savedColleges,
+      user,
+      activityLog,
+      quizAnswers,
+      personalizedCollegeSuggestions,
+      setPersonalizedCollegeSuggestions,
+    } = store;
+
     const [scores, setScores] = useState({
       distance: 50,
       programs: 70,
@@ -49,33 +65,11 @@ export default function ProfilePage() {
     });
     
     const [isLoading, setIsLoading] = useState(false);
-    const [recommendations, setRecommendations] = useState<CollegeRecommendation[] | null>(null);
-    const store = useResultsStore();
-    const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
-    const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
-    const [savedColleges, setSavedColleges] = useState(store.savedColleges);
-    const [user, setUser] = useState(store.user);
-    const [activityLog, setActivityLog] = useState(store.activityLog);
-    const [quizAnswers, setQuizAnswers] = useState(store.quizAnswers);
     
-    const { toast } = useToast();
-    const router = useRouter();
     const isLocked = !chosenCareer && !careerSuggestions;
     const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
     const educationLevel = quizAnswers?.educationLevel as string | undefined;
 
-    useEffect(() => {
-        const unsub = useResultsStore.subscribe((state) => {
-            setCareerSuggestions(state.careerSuggestions);
-            setChosenCareer(state.chosenCareer);
-            setSavedColleges(state.savedColleges);
-            setUser(state.user);
-            setActivityLog(state.activityLog);
-            setQuizAnswers(state.quizAnswers);
-        });
-        return () => unsub();
-    }, []);
-    
     const handleScoreChange = (category: keyof typeof scores, value: number[]) => {
       setScores(prev => ({ ...prev, [category]: value[0] }));
     };
@@ -95,8 +89,8 @@ export default function ProfilePage() {
         return Math.round((weightedSum / totalWeight));
     }
 
-    const sortedRecommendations = recommendations 
-      ? [...recommendations].sort((a, b) => {
+    const sortedRecommendations = personalizedCollegeSuggestions
+      ? [...personalizedCollegeSuggestions.recommendations].sort((a, b) => {
           const scoreA = calculateOverallFitScore(a.attributes);
           const scoreB = calculateOverallFitScore(b.attributes);
           return scoreB - scoreA;
@@ -124,7 +118,7 @@ export default function ProfilePage() {
         }
 
         setIsLoading(true);
-        setRecommendations(null);
+        setPersonalizedCollegeSuggestions(null as any); // Clear previous results
 
         try {
             const result = await getPersonalizedCollegeSuggestions({
@@ -132,7 +126,7 @@ export default function ProfilePage() {
                 educationLevel: educationLevel,
                 fitScorerPreferences: scores
             });
-            setRecommendations(result.recommendations);
+            setPersonalizedCollegeSuggestions(result);
         } catch (error) {
             console.error("Failed to get recommendations:", error);
             toast({
@@ -144,6 +138,13 @@ export default function ProfilePage() {
             setIsLoading(false);
         }
     };
+    
+    // Fetch only if needed
+    const handleFetchIfNeeded = () => {
+      if (!personalizedCollegeSuggestions) {
+        handleFetchRecommendations();
+      }
+    }
 
     const handleResetData = () => {
       store.reset();
@@ -255,9 +256,9 @@ export default function ProfilePage() {
                             <Separator />
 
                             <div>
-                                <Button onClick={handleFetchRecommendations} disabled={isLoading} className="w-full">
+                                <Button onClick={handleFetchIfNeeded} disabled={isLoading} className="w-full">
                                     {isLoading ? <Loader2 className="animate-spin" /> : <GraduationCap />}
-                                    {recommendations ? "Refresh Recommendations" : "Get Personalized College Recommendations"}
+                                    {personalizedCollegeSuggestions ? "Refresh Recommendations" : "Get Personalized College Recommendations"}
                                 </Button>
                             </div>
 

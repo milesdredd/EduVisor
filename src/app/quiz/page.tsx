@@ -24,9 +24,12 @@ export default function QuizPage() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setCareerSuggestions(store.careerSuggestions);
     setIsClient(true);
-  }, [store.careerSuggestions]);
+    const unsub = useResultsStore.subscribe((state) => {
+        setCareerSuggestions(state.careerSuggestions);
+    });
+    return () => unsub();
+  }, []);
 
   const handleRetakeQuiz = () => {
     store.reset();

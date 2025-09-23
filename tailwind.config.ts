@@ -12,7 +12,7 @@ export default {
       fontFamily: {
         body: ['"PT Sans"', 'sans-serif'],
         headline: ['"PT Sans"', 'sans-serif'],
-        code: ['"PT Sans"', 'monospace'],
+        code: ['monospace', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',

@@ -10,11 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Bot, CalendarCheck, HelpCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Bot, CalendarCheck, HelpCircle, Loader2, ArrowRight, BookPlus } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { getStudyPlan, StudyPlanOutput } from '@/ai/flows/study-plan';
 import { askTutor, AskTutorOutput } from '@/ai/flows/ask-tutor';
 import { useResultsStore } from '@/hooks/use-results-store';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 function StudyPlannerSkeleton() {
     return (
@@ -45,13 +46,14 @@ function StudyPlannerSkeleton() {
 function StudyPlannerContent() {
     const searchParams = useSearchParams();
     const { toast } = useToast();
-    const { chosenCareer } = useResultsStore();
+    const { chosenCareer, addSyllabusItems } = useResultsStore();
     const careerParam = searchParams.get("career");
 
     // Use chosenCareer from the store as the primary source, fallback to param
     const career = chosenCareer?.title || careerParam;
 
-    const [timeframe, setTimeframe] = useState("3 months");
+    const [timeframeValue, setTimeframeValue] = useState(3);
+    const [timeframeUnit, setTimeframeUnit] = useState("months");
     const [studyPlan, setStudyPlan] = useState<StudyPlanOutput | null>(null);
     const [isPlanLoading, setIsPlanLoading] = useState(false);
 
@@ -67,6 +69,7 @@ function StudyPlannerContent() {
         setIsPlanLoading(true);
         setStudyPlan(null);
         try {
+            const timeframe = `${timeframeValue} ${timeframeUnit}`;
             const result = await getStudyPlan({ career, timeframe });
             setStudyPlan(result);
         } catch (error) {
@@ -95,6 +98,16 @@ function StudyPlannerContent() {
         }
     };
 
+    const handleAddPlanToSyllabus = () => {
+        if (!studyPlan) return;
+        const allTopics = studyPlan.plan.flatMap(week => week.topics);
+        addSyllabusItems(allTopics);
+        toast({
+            title: "Plan Added!",
+            description: "Your study plan has been added to your syllabus on the dashboard.",
+        });
+    };
+
     if (!career) {
         return (
              <div className="text-center">
@@ -111,17 +124,30 @@ function StudyPlannerContent() {
             <Card>
                 <CardHeader>
                     <CardTitle className="flex items-center gap-3"><CalendarCheck /> Personalized Timetable</CardTitle>
-                    <CardDescription>Generate a weekly study plan based on your preparation timeframe.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="flex gap-4">
-                        <Input
-                            placeholder="e.g. 3 months, 6 weeks"
-                            value={timeframe}
-                            onChange={(e) => setTimeframe(e.target.value)}
+                    <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
+                        <span className="text-sm font-medium">Make a</span>
+                         <Input
+                            type="number"
+                            min="1"
+                            value={timeframeValue}
+                            onChange={(e) => setTimeframeValue(parseInt(e.target.value, 10))}
+                            className="w-20"
                         />
-                        <Button onClick={handleGetStudyPlan} disabled={isPlanLoading}>
-                            {isPlanLoading ? <Loader2 className="animate-spin" /> : "Generate Plan"}
+                        <Select value={timeframeUnit} onValueChange={setTimeframeUnit}>
+                            <SelectTrigger className="w-[120px]">
+                                <SelectValue placeholder="Select unit" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="weeks">Weeks</SelectItem>
+                                <SelectItem value="months">Months</SelectItem>
+                                <SelectItem value="years">Years</SelectItem>
+                            </SelectContent>
+                        </Select>
+                         <span className="text-sm font-medium">planner</span>
+                        <Button onClick={handleGetStudyPlan} disabled={isPlanLoading} size="icon" className="rounded-full">
+                            {isPlanLoading ? <Loader2 className="animate-spin" /> : <ArrowRight />}
                         </Button>
                     </div>
 
@@ -129,7 +155,13 @@ function StudyPlannerContent() {
                     
                     {studyPlan && (
                         <div className="pt-6">
-                            <h3 className="text-xl font-semibold mb-4">Your {timeframe} Study Plan</h3>
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-semibold">Your {`${timeframeValue} ${timeframeUnit}`} Study Plan</h3>
+                                <Button onClick={handleAddPlanToSyllabus}>
+                                    <BookPlus className="mr-2 h-4 w-4"/>
+                                    Add to My Syllabus
+                                </Button>
+                            </div>
                             <Accordion type="single" collapsible className="w-full">
                                 {studyPlan.plan.map((week, index) => (
                                     <AccordionItem value={`item-${index}`} key={index}>

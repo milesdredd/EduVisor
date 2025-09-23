@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Lightbulb, TrendingUp } from "lucide-react";
+import { Lightbulb, TrendingUp, ArrowRight } from "lucide-react";
 import type { PersonalizedCareerSuggestionsOutput } from "@/ai/flows/personalized-career-suggestions";
 import {
   Card,
@@ -40,9 +40,9 @@ export function CareerSuggestions({ suggestions }: CareerSuggestionsProps) {
               </div>
             </CardContent>
             <CardFooter>
-              <Button asChild variant="link" className="p-0">
+              <Button asChild className="w-full">
                 <Link href={`/career/${encodeURIComponent(suggestion.career.toLowerCase().replace(/ /g, '-'))}`}>
-                  Learn More
+                  Explore <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </CardFooter>

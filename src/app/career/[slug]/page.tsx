@@ -1,3 +1,4 @@
+
 "use client";
 
 import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight, ExternalLink, Award, FileCheck2 } from "lucide-react";
@@ -34,7 +35,7 @@ import {
 
 function CareerDetailSkeleton() {
     return (
-        <div className="space-y-10">
+        <div className="space-y-10 animate-pulse">
             <Card>
                 <CardHeader>
                     <Skeleton className="h-10 w-3/4" />
@@ -59,10 +60,10 @@ function CareerDetailSkeleton() {
                          <div>
                             <h3 className="font-semibold mb-2">Required Skills</h3>
                             <div className="flex flex-wrap gap-2">
-                                <Skeleton className="h-6 w-24" />
-                                <Skeleton className="h-6 w-32" />
-                                <Skeleton className="h-6 w-20" />
-                                <Skeleton className="h-6 w-28" />
+                                <Skeleton className="h-6 w-24 rounded-full" />
+                                <Skeleton className="h-6 w-32 rounded-full" />
+                                <Skeleton className="h-6 w-20 rounded-full" />
+                                <Skeleton className="h-6 w-28 rounded-full" />
                             </div>
                         </div>
                     </CardContent>
@@ -95,7 +96,7 @@ function CareerDetailSkeleton() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2"><BookOpen /> Academic Pathway & Scholarships</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-6">
                     <div className="mb-6">
                         <h3 className="font-semibold mb-2">Summarized Academic Pathway</h3>
                         <Skeleton className="h-4 w-full" />
@@ -109,7 +110,7 @@ function CareerDetailSkeleton() {
                         </div>
                     </div>
                      <Button disabled>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Explore Colleges for this Path
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Fetching details...
                     </Button>
                 </CardContent>
             </Card>
@@ -125,7 +126,7 @@ function CareerDetailSkeleton() {
                 </CardContent>
             </Card>
       </div>
-    )
+    );
 }
 
 
@@ -135,18 +136,26 @@ export default function CareerDetailPage() {
   const [isCollegesLoading, setIsCollegesLoading] = useState(false);
   const [collegeRecommendations, setCollegeRecommendations] = useState<CollegeRecommendationsOutput | null>(null);
   const { toast } = useToast();
-  const { chosenCareer, setChosenCareer, addActivity, quizAnswers } = useResultsStore();
+  const { chosenCareer, setChosenCareer, addActivity, quizAnswers, careerDetailsCache, setCareerDetail } = useResultsStore();
   const isCareerChosen = chosenCareer?.title === career?.title;
   const params = useParams<{ slug: string }>();
 
 
   useEffect(() => {
     const fetchDetails = async () => {
+        const careerTitle = decodeURIComponent(params.slug).split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        
+        if (careerDetailsCache[careerTitle]) {
+            setCareer(careerDetailsCache[careerTitle]);
+            setIsLoading(false);
+            return;
+        }
+
         setIsLoading(true);
         try {
-            const careerTitle = decodeURIComponent(params.slug).split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
             const details = await getCareerDetails({ career: careerTitle });
             setCareer(details);
+            setCareerDetail(careerTitle, details);
             addActivity({ description: `Viewed '${careerTitle}' career`, icon: 'Briefcase' });
         } catch (error) {
             console.error("Failed to fetch career details:", error);
@@ -163,7 +172,7 @@ export default function CareerDetailPage() {
     if (params.slug) {
         fetchDetails();
     }
-  }, [params.slug, toast, addActivity]);
+  }, [params.slug, toast, addActivity, careerDetailsCache, setCareerDetail]);
   
   const handleFetchRecommendations = async () => {
     if (!career) return;
@@ -234,7 +243,7 @@ export default function CareerDetailPage() {
             </Button>
             <p>Could not load career details. Please try again later.</p>
         </div>
-    )
+    );
   }
 
   return (
@@ -325,7 +334,11 @@ export default function CareerDetailPage() {
                 <CardContent className="space-y-4">
                     <div>
                         <h3 className="font-semibold flex items-center gap-2 mb-2"><Wallet className="w-5 h-5" /> Potential Salary</h3>
-                        <p className="text-lg font-medium">{career.potentialSalary}</p>
+                        <p className="text-lg font-medium">
+                            {career.potentialSalary.split('₹').map((part, i) =>
+                                i === 0 ? part : <span key={i}><span className="font-code">₹</span>{part}</span>
+                            )}
+                        </p>
                     </div>
                      <div>
                         <h3 className="font-semibold flex items-center gap-2 mb-2"><TrendingUp className="w-5 h-5" /> Job Growth</h3>
