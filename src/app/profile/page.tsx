@@ -62,6 +62,7 @@ export default function ProfilePage() {
     const router = useRouter();
     const isLocked = !chosenCareer && !careerSuggestions;
     const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
+    const educationLevel = quizAnswers?.educationLevel as string | undefined;
 
     useEffect(() => {
         const unsub = useResultsStore.subscribe((state) => {
@@ -113,7 +114,6 @@ export default function ProfilePage() {
             return;
         }
 
-        const educationLevel = quizAnswers?.educationLevel as string;
         if (!educationLevel) {
             toast({
                 variant: "destructive",
@@ -324,7 +324,7 @@ export default function ProfilePage() {
             </Card>
         </div>
         <div className="space-y-8">
-          <TimelineTracker career={timelineCareer} isLocked={isLocked} />
+          <TimelineTracker career={timelineCareer} educationLevel={educationLevel} isLocked={isLocked} />
 
           <Card>
             <CardHeader>

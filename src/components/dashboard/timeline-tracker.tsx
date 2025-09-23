@@ -20,20 +20,24 @@ import {
   DialogTrigger,
   DialogClose
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { format, differenceInDays, parseISO, isPast } from 'date-fns';
+
 
 interface TimelineEvent {
   id: number;
   title: string;
-  date: string;
+  date: string; // YYYY-MM-DD format
   type: 'exam' | 'deadline' | 'custom';
 }
 
 interface TimelineTrackerProps {
     career?: string;
+    educationLevel?: string;
     isLocked?: boolean;
 }
 
-export function TimelineTracker({ career, isLocked = false }: TimelineTrackerProps) {
+export function TimelineTracker({ career, educationLevel, isLocked = false }: TimelineTrackerProps) {
     const [events, setEvents] = useState<TimelineEvent[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [newEventTitle, setNewEventTitle] = useState("");
@@ -41,11 +45,11 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
     const { toast } = useToast();
 
     useEffect(() => {
-        if (career) {
+        if (career && educationLevel) {
             const fetchEvents = async () => {
                 setIsLoading(true);
                 try {
-                    const result = await getTimelineEvents({ career });
+                    const result = await getTimelineEvents({ career, educationLevel });
                     const fetchedEvents = result.events.map((e, index) => ({ ...e, id: index, type: e.type as 'exam' | 'deadline' }));
                     setEvents(fetchedEvents);
                 } catch (error) {
@@ -63,14 +67,14 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
         } else {
             setEvents([]);
         }
-    }, [career, toast]);
+    }, [career, educationLevel, toast]);
 
     const handleAddEvent = () => {
         if (!newEventTitle || !newEventDate) {
             toast({
                 variant: "destructive",
                 title: "Missing fields",
-                description: "Please provide both a title and a date.",
+                description: "Please provide both a title and a date in YYYY-MM-DD format.",
             });
             return;
         }
@@ -88,6 +92,22 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
             description: `'${newEvent.title}' has been added to your timeline.`
         });
     };
+
+    const getEventStatus = (date: string): 'past' | 'soon' | 'future' => {
+        const eventDate = parseISO(date);
+        const now = new Date();
+        
+        if (isPast(eventDate)) {
+            return 'past';
+        }
+        
+        const daysUntil = differenceInDays(eventDate, now);
+        if (daysUntil <= 30) {
+            return 'soon';
+        }
+
+        return 'future';
+    }
     
     return (
         <Card>
@@ -99,7 +119,7 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
                     </div>
                      <Dialog>
                         <DialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" disabled={isLocked}>
                                 <PlusCircle className="w-5 h-5" />
                             </Button>
                         </DialogTrigger>
@@ -129,10 +149,10 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
                                     </Label>
                                     <Input
                                         id="event-date"
+                                        type="date"
                                         value={newEventDate}
                                         onChange={(e) => setNewEventDate(e.target.value)}
                                         className="col-span-3"
-                                        placeholder="e.g. JUL 20"
                                     />
                                 </div>
                             </div>
@@ -152,24 +172,41 @@ export function TimelineTracker({ career, isLocked = false }: TimelineTrackerPro
                         <Loader2 className="animate-spin text-primary" />
                     </div>
                 ) : events.length > 0 ? (
-                    events.map((event, index) => (
-                        <div key={event.id}>
-                            <div className="flex items-center">
-                                <div className="bg-primary/20 text-primary p-2 rounded-md text-center w-16">
-                                    <p className="font-bold text-sm uppercase">{event.date.split(' ')[0]}</p>
-                                    <p className="font-bold text-2xl">{event.date.split(' ')[1]}</p>
+                    events.map((event, index) => {
+                        const eventDate = parseISO(event.date);
+                        const status = getEventStatus(event.date);
+
+                        return(
+                            <div key={event.id}>
+                                <div className="flex items-center">
+                                    <div className={cn("text-center w-20 p-2 rounded-md", 
+                                       status === 'past' && 'bg-red-200 text-red-800',
+                                       status === 'soon' && 'bg-yellow-200 text-yellow-800',
+                                       status === 'future' && 'bg-primary/20 text-primary',
+                                    )}>
+                                        <p className="font-bold text-sm uppercase">{format(eventDate, 'MMM')}</p>
+                                        <p className="font-bold text-2xl">{format(eventDate, 'dd')}</p>
+                                    </div>
+                                    <p className={cn("ml-4 text-sm", status === 'past' && 'line-through text-muted-foreground')}>
+                                        {event.title}
+                                    </p>
                                 </div>
-                                <p className="ml-4 text-sm">{event.title}</p>
+                                {index < events.length - 1 && <Separator className="my-4" />}
                             </div>
-                            {index < events.length - 1 && <Separator className="my-4" />}
-                        </div>
-                    ))
+                        )
+                    })
                 ) : (
                     <div className="text-center text-muted-foreground p-4">
-                        <p>Nothing on your timeline yet.</p>
-                        <p className="text-sm">
-                            <Button variant="link" asChild className="p-0"><Link href="/quiz">Take the assessment</Link></Button> or add a custom event now.
-                        </p>
+                         {isLocked ? (
+                            <>
+                                <p>Nothing on your timeline yet.</p>
+                                <p className="text-sm">
+                                    <Button variant="link" asChild className="p-0"><Link href="/quiz">Take the assessment</Link></Button> to see relevant dates.
+                                </p>
+                            </>
+                         ) : (
+                            <p>No relevant dates found. Add a custom event!</p>
+                         )}
                     </div>
                 )}
             </CardContent>

@@ -111,6 +111,8 @@ export default function DashboardPage() {
     const store = useResultsStore();
     const [chosenCareer, setChosenCareer] = useState(store.chosenCareer);
     const [careerSuggestions, setCareerSuggestions] = useState(store.careerSuggestions);
+    const [quizAnswers, setQuizAnswers] = useState(store.quizAnswers);
+
     const { toast } = useToast();
 
     const [details, setDetails] = useState<DashboardDetailsOutput | null>(null);
@@ -122,11 +124,13 @@ export default function DashboardPage() {
 
     const isLocked = !chosenCareer && !careerSuggestions;
     const timelineCareer = chosenCareer?.title || careerSuggestions?.suggestions?.[0]?.career;
+    const educationLevel = quizAnswers?.educationLevel as string | undefined;
 
     useEffect(() => {
         const unsub = useResultsStore.subscribe((state) => {
             setChosenCareer(state.chosenCareer);
             setCareerSuggestions(state.careerSuggestions);
+            setQuizAnswers(state.quizAnswers);
         });
         return () => unsub();
     }, []);
@@ -345,7 +349,7 @@ export default function DashboardPage() {
                             </CardContent>
                         </Card>
 
-                        <TimelineTracker career={timelineCareer} isLocked={isLocked} />
+                        <TimelineTracker career={timelineCareer} educationLevel={educationLevel} isLocked={isLocked} />
 
                         <Card className="bg-secondary">
                             <CardHeader>
