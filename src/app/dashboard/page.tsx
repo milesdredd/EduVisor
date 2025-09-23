@@ -158,7 +158,7 @@ export default function DashboardPage() {
       ? Math.round((Object.values(syllabusProgress).filter(Boolean).length / details.syllabus.length) * 100)
       : 0;
     
-    const showDashboardContent = chosenCareer && !isLoadingDetails;
+    const showDashboardContent = chosenCareer && !isLoadingDetails && details;
     
     return (
         <div className="container mx-auto py-12 space-y-8">
@@ -265,7 +265,11 @@ export default function DashboardPage() {
                                 )}
                             </CardContent>
                             <CardFooter>
-                                <Button variant="secondary" disabled={isLocked}>Explore More Resources</Button>
+                                <Button variant="secondary" disabled={isLocked || !chosenCareer} asChild>
+                                    <Link href={`/resources?career=${encodeURIComponent(chosenCareer?.title || '')}`}>
+                                        Explore More Resources
+                                    </Link>
+                                </Button>
                             </CardFooter>
                         </Card>
                         
