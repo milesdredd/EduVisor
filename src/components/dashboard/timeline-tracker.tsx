@@ -320,4 +320,4 @@ export function TimelineTracker({ career, educationLevel, isLocked = false }: Ti
         </Card>
     );
 
-    
+}
