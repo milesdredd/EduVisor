@@ -16,6 +16,7 @@ const SearchCollegesInputSchema = z.object({
   maxDistance: z.number().optional().describe('Maximum distance from the user in kilometers.'),
   stream: z.string().optional().describe('The academic stream or career field the user is interested in.'),
   sortBy: z.enum(['ranking', 'fees', 'distance']).default('ranking').describe('The criteria to sort the results by.'),
+  educationLevel: z.string().optional().describe("The user's current education level (e.g., 'Completed Class 12', 'Undergraduate')."),
 });
 export type SearchCollegesInput = z.infer<typeof SearchCollegesInputSchema>;
 
@@ -53,6 +54,7 @@ User's Location: {{{userLocation}}}
 Desired Stream/Career: {{{stream}}}
 Maximum Distance: {{{maxDistance}}} km
 Sort By: {{{sortBy}}}
+Education Level: {{{educationLevel}}}
 
 **Instructions:**
 1.  Generate a list of 5-7 Indian government colleges that match the user's query.
@@ -61,10 +63,13 @@ Sort By: {{{sortBy}}}
 4.  Calculate the approximate distance from the user's location.
 5.  Provide a realistic overall rating out of 5.
 6.  If a stream is provided, list courses relevant to that stream.
-7.  For each college, list the 1-2 primary entrance exams required for the popular courses.
-8.  For each college, provide a one-sentence summary of their key admission criteria.
-9.  CRITICAL: ONLY include government-funded colleges. Do NOT include any private universities.
-10. Sort the final list according to the user's 'sortBy' preference.
+7.  **CRITICAL**: The listed courses and entrance exams MUST be relevant to the user's education level.
+    - If education level is 'Completed Class 12', list UNDERGRADUATE courses and exams.
+    - If education level is 'Undergraduate', list POSTGRADUATE courses and exams.
+8.  For each college, list the 1-2 primary entrance exams required for the popular courses.
+9.  For each college, provide a one-sentence summary of their key admission criteria.
+10. CRITICAL: ONLY include government-funded colleges. Do NOT include any private universities.
+11. Sort the final list according to the user's 'sortBy' preference.
 `,
 });
 
