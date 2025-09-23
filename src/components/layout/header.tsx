@@ -52,14 +52,6 @@ export function Header() {
                         </NavigationMenuLink>
                         </Link>
                     </NavigationMenuItem>
-                    <NavigationMenuItem>
-                        <Link href={`/study-planner?career=${encodeURIComponent(chosenCareer?.title || '')}`} legacyBehavior passHref>
-                            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                <BrainCircuit className="mr-2" />
-                                Study Planner
-                            </NavigationMenuLink>
-                        </Link>
-                    </NavigationMenuItem>
                  </>
               )}
               <NavigationMenuItem>
