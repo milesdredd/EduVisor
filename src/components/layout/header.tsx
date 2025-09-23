@@ -45,45 +45,48 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 flex items-center">
+      <div className="flex h-16 items-center px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center">
           <Link href="/" className="flex items-center space-x-2">
             <Image src="/icons/icon.png" alt="EduVisor Logo" width={30} height={30} />
             <span className="font-bold hidden sm:inline-block">EduVisor</span>
           </Link>
         </div>
-        <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <Link href="/quiz" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Assessment
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            {showDashboardLinks && (
-               <>
-                  <NavigationMenuItem>
-                      <Link href="/dashboard" legacyBehavior passHref>
-                      <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                          <LayoutDashboard className="mr-2" />
-                          Dashboard
-                      </NavigationMenuLink>
-                      </Link>
-                  </NavigationMenuItem>
-               </>
-            )}
-            <NavigationMenuItem>
-              <Link href="/colleges" legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                  Colleges
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+
+        <div className="flex-1 flex justify-center">
+            <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList>
+                <NavigationMenuItem>
+                <Link href="/quiz" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Assessment
+                    </NavigationMenuLink>
+                </Link>
+                </NavigationMenuItem>
+                {showDashboardLinks && (
+                <>
+                    <NavigationMenuItem>
+                        <Link href="/dashboard" legacyBehavior passHref>
+                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                            <LayoutDashboard className="mr-2" />
+                            Dashboard
+                        </NavigationMenuLink>
+                        </Link>
+                    </NavigationMenuItem>
+                </>
+                )}
+                <NavigationMenuItem>
+                <Link href="/colleges" legacyBehavior passHref>
+                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    Colleges
+                    </NavigationMenuLink>
+                </Link>
+                </NavigationMenuItem>
+            </NavigationMenuList>
+            </NavigationMenu>
+        </div>
         
-        <div className="flex flex-1 items-center justify-end space-x-4">
+        <div className="flex items-center justify-end space-x-4">
           <ThemeToggle />
           {isClient && user && (
             <DropdownMenu>
