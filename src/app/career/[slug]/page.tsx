@@ -111,7 +111,7 @@ function CareerDetailSkeleton() {
                      <Button disabled>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Explore Colleges for this Path
                     </Button>
-                </CardContent>
+                </CardContent>.
             </Card>
 
             <Card className="bg-primary/10 border-primary/30">
@@ -263,7 +263,7 @@ export default function CareerDetailPage() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Are you ready to commit to this path?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            <p className="italic text-center my-4">"The future depends on what you do today." - Mahatma Gandhi</p>
+                            <div className="italic text-center my-4">"The future depends on what you do today." - Mahatma Gandhi</div>
                             This action will set '{career.title}' as your chosen career path. You can always explore and change your path later. 😉
                           </AlertDialogDescription>
                         </AlertDialogHeader>
