@@ -25,7 +25,9 @@ export type CollegeRecommendationsInput = z.infer<
 
 const CollegeRecommendationSchema = z.object({
     collegeName: z.string().describe('The name of the potential college and its relevant educational track.'),
-    websiteUrl: z.string().url().describe('The official website URL of the college.')
+    websiteUrl: z.string().url().describe('The official website URL of the college.'),
+    entranceExams: z.array(z.string()).describe("A list of 1-2 primary entrance exams for admission (e.g., 'JEE Advanced', 'CAT')."),
+    admissionCriteria: z.string().describe("A brief, one-sentence summary of the key admission criteria (e.g., 'Based on entrance exam rank and 12th-grade marks.')."),
 });
 
 const CollegeRecommendationsOutputSchema = z.object({
@@ -57,9 +59,11 @@ Follow these steps:
 2.  If the user's education level is 'Completed Class 12', suggest relevant UNDERGRADUATE programs (e.g., B.Tech, B.Sc.).
 3.  If the user's education level is 'Undergraduate', suggest relevant POSTGRADUATE programs (e.g., M.Tech, M.Sc., MBA).
 4.  Find the official, valid website URL for that college.
-5.  CRITICAL: Verify if the college is a government-funded and operated institution located within India.
-6.  If and ONLY IF the college is an Indian government college, add it to the list with its name, a RELEVANT degree track, and official URL.
-7.  Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
+5.  Identify the 1-2 primary entrance exams required for the suggested program.
+6.  Summarize the key admission criteria in one sentence.
+7.  CRITICAL: Verify if the college is a government-funded and operated institution located within India.
+8.  If and ONLY IF the college is an Indian government college, add it to the list with its name, a RELEVANT degree track, official URL, entrance exams, and admission criteria.
+9.  Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
 `,
 });
 

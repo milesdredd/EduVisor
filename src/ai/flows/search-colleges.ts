@@ -30,6 +30,8 @@ const SearchCollegesOutputSchema = z.object({
       fees: z.string().describe('The approximate annual tuition fees in INR.'),
       courses: z.array(z.string()).describe('A list of 2-3 popular courses relevant to the search stream.'),
       rating: z.number().min(0).max(5).describe('An overall rating out of 5.'),
+      entranceExams: z.array(z.string()).describe("A list of 1-2 primary entrance exams for admission (e.g., 'JEE Advanced', 'CAT')."),
+      admissionCriteria: z.string().describe("A brief, one-sentence summary of the key admission criteria (e.g., 'Based on entrance exam rank and 12th-grade marks.')."),
     })
   ).describe('A list of Indian government colleges matching the search criteria.'),
 });
@@ -59,8 +61,10 @@ Sort By: {{{sortBy}}}
 4.  Calculate the approximate distance from the user's location.
 5.  Provide a realistic overall rating out of 5.
 6.  If a stream is provided, list courses relevant to that stream.
-7.  CRITICAL: ONLY include government-funded colleges. Do NOT include any private universities.
-8.  Sort the final list according to the user's 'sortBy' preference.
+7.  For each college, list the 1-2 primary entrance exams required for the popular courses.
+8.  For each college, provide a one-sentence summary of their key admission criteria.
+9.  CRITICAL: ONLY include government-funded colleges. Do NOT include any private universities.
+10. Sort the final list according to the user's 'sortBy' preference.
 `,
 });
 

@@ -6,7 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FileText, Briefcase, Building, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck, LogOut, Search, ExternalLink } from "lucide-react";
+import { FileText, Briefcase, Building, BarChart3, SlidersHorizontal, Star, ListChecks, GraduationCap, Loader2, Compass, Lock, Trash2, Bookmark, BookmarkCheck, LogOut, Search, ExternalLink, Award, FileCheck2 } from "lucide-react";
 import { Slider } from '@/components/ui/slider';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Progress } from '@/components/ui/progress';
@@ -154,8 +154,14 @@ export default function ProfilePage() {
       router.push('/quiz');
     };
 
-    const handleSaveCollege = (rec: { collegeName: string; reason: string; websiteUrl: string; }) => {
-        store.addSavedCollege(rec);
+    const handleSaveCollege = (rec: CollegeRecommendation) => {
+        store.addSavedCollege({ 
+            collegeName: rec.collegeName, 
+            reason: rec.reason, 
+            websiteUrl: rec.websiteUrl,
+            entranceExams: rec.entranceExams,
+            admissionCriteria: rec.admissionCriteria
+        });
         toast({
             title: "College Saved!",
             description: `${rec.collegeName} has been added to your list.`,
@@ -273,6 +279,16 @@ export default function ProfilePage() {
                                                     <div>
                                                         <AlertTitle className="font-bold">{rec.collegeName}</AlertTitle>
                                                         <AlertDescription>{rec.reason}</AlertDescription>
+                                                         <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                                                            <div className="flex items-start gap-2">
+                                                                <Award className="w-4 h-4 mt-0.5 text-primary" />
+                                                                <p><span className="font-semibold text-foreground">Exams:</span> {rec.entranceExams.join(', ')}</p>
+                                                            </div>
+                                                            <div className="flex items-start gap-2">
+                                                                <FileCheck2 className="w-4 h-4 mt-0.5 text-primary" />
+                                                                <p><span className="font-semibold text-foreground">Criteria:</span> {rec.admissionCriteria}</p>
+                                                            </div>
+                                                        </div>
                                                          <Button asChild variant="link" className="p-0 h-auto mt-2">
                                                             <a href={rec.websiteUrl} target="_blank" rel="noopener noreferrer">
                                                                 Visit Website <ExternalLink className="ml-2" />
@@ -287,7 +303,7 @@ export default function ProfilePage() {
                                                       <Button
                                                           variant="ghost"
                                                           size="icon"
-                                                          onClick={() => handleSaveCollege({ collegeName: rec.collegeName, reason: rec.reason, websiteUrl: rec.websiteUrl })}
+                                                          onClick={() => handleSaveCollege(rec)}
                                                           disabled={isSaved}
                                                           className="h-8 w-8"
                                                       >

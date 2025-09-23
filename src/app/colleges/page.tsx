@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building, MapPin, Search, Loader2, Star, Milestone, IndianRupee, GraduationCap, Trash2, ShoppingBasket, ExternalLink } from "lucide-react";
+import { Building, MapPin, Search, Loader2, Star, Milestone, IndianRupee, GraduationCap, Trash2, ShoppingBasket, ExternalLink, Award, FileCheck2 } from "lucide-react";
 import Link from "next/link";
 import { useResultsStore } from "@/hooks/use-results-store";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -148,14 +148,26 @@ export default function CollegesPage() {
                 <CardContent className="p-6 space-y-4">
                     {savedColleges.map((college, index) => (
                         <div key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                           <div className="flex items-start gap-4">
-                             <Building className="h-5 w-5 mt-1 text-primary" />
-                             <div>
-                               <p className="font-semibold">{college.collegeName}</p>
-                               <p className="text-sm text-muted-foreground">{college.reason}</p>
-                             </div>
+                           <div className="flex-grow">
+                                <div className="flex items-start gap-4">
+                                 <Building className="h-5 w-5 mt-1 text-primary" />
+                                 <div>
+                                   <p className="font-semibold">{college.collegeName}</p>
+                                   <p className="text-sm text-muted-foreground">{college.reason}</p>
+                                    <div className="mt-2 text-sm space-y-1">
+                                       <div className="flex items-start gap-2">
+                                          <Award className="w-4 h-4 mt-0.5" />
+                                          <span><span className="font-semibold">Exams:</span> {college.entranceExams.join(', ')}</span>
+                                      </div>
+                                      <div className="flex items-start gap-2">
+                                          <FileCheck2 className="w-4 h-4 mt-0.5" />
+                                          <span><span className="font-semibold">Criteria:</span> {college.admissionCriteria}</span>
+                                      </div>
+                                    </div>
+                                 </div>
+                               </div>
                            </div>
-                           <div className="flex items-center gap-2">
+                           <div className="flex items-center gap-2 flex-shrink-0">
                              {college.websiteUrl && (
                                 <Button asChild size="sm" variant="ghost">
                                   <a href={college.websiteUrl} target="_blank" rel="noopener noreferrer">
@@ -278,11 +290,20 @@ export default function CollegesPage() {
                     <div className="flex items-center gap-2" title="Ranking"><GraduationCap /> {college.ranking}</div>
                   </div>
                   <Alert className="mt-4">
-                    <h4 className="font-semibold mb-2">Relevant Courses</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {college.courses.map(course => (
-                        <div key={course} className="text-sm bg-secondary text-secondary-foreground rounded px-2 py-1">{course}</div>
-                      ))}
+                     <AlertTitle className="font-semibold mb-3">Admission Details</AlertTitle>
+                    <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                            <Award className="w-4 h-4 mt-1 text-primary" />
+                            <p><span className="font-semibold">Relevant Courses:</span> {college.courses.join(', ')}</p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                            <Award className="w-4 h-4 mt-1 text-primary" />
+                            <p><span className="font-semibold">Entrance Exams:</span> {college.entranceExams.join(', ')}</p>
+                        </div>
+                        <div className="flex items-start gap-2">
+                            <FileCheck2 className="w-4 h-4 mt-1 text-primary" />
+                            <p><span className="font-semibold">Admission Criteria:</span> {college.admissionCriteria}</p>
+                        </div>
                     </div>
                   </Alert>
                 </CardContent>

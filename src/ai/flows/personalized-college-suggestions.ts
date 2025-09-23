@@ -57,6 +57,8 @@ const PersonalizedCollegeSuggestionsOutputSchema = z.object({
           'A brief explanation for why this college is a good fit based on the user\'s career goals.'
         ),
       attributes: CollegeAttributesSchema.describe("A breakdown of the college's scores for each attribute."),
+      entranceExams: z.array(z.string()).describe("A list of 1-2 primary entrance exams for admission (e.g., 'JEE Advanced', 'CAT')."),
+      admissionCriteria: z.string().describe("A brief, one-sentence summary of the key admission criteria (e.g., 'Based on entrance exam rank and 12th-grade marks.')."),
     })
   ).describe('A list of personalized college recommendations with detailed attribute scores.'),
 });
@@ -89,8 +91,10 @@ const prompt = ai.definePrompt({
     - If education level is 'Completed Class 12', suggest UNDERGRADUATE programs.
     - If education level is 'Undergraduate', suggest POSTGRADUATE programs.
 4.  For each recommendation, provide a brief reason that connects the college to the user's career paths.
-5.  CRITICAL: For each recommended college, you MUST provide a score from 0 to 100 for EACH of the following attributes based on real-world data and reputation: distance (assume a lower score for farther colleges), programs, labs, hostel, cutoffs (academic rigor), placements, and accessibility. These scores should be objective measures of the college's strengths.
-6.  CRITICAL: Verify that each college is a government-funded and operated institution located within India. Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
+5.  Identify the 1-2 primary entrance exams for admission to the recommended program.
+6.  Provide a one-sentence summary of the admission criteria.
+7.  CRITICAL: For each recommended college, you MUST provide a score from 0 to 100 for EACH of the following attributes based on real-world data and reputation: distance (assume a lower score for farther colleges), programs, labs, hostel, cutoffs (academic rigor), placements, and accessibility. These scores should be objective measures of the college's strengths.
+8.  CRITICAL: Verify that each college is a government-funded and operated institution located within India. Do NOT include any private universities, foreign universities, or any institution that is not a government college in India. There are no exceptions.
 `,
 });
 

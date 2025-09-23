@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight, ExternalLink } from "lucide-react";
+import { ArrowLeft, BookOpen, Briefcase, Wallet, PlusCircle, Search, Sparkles, TrendingUp, Loader2, GraduationCap, CheckCircle, Heart, ArrowRight, ExternalLink, Award, FileCheck2 } from "lucide-react";
 import Link from "next/link";
 import {
   Card,
@@ -380,19 +380,29 @@ export default function CareerDetailPage() {
                         <GraduationCap /> Suggested Colleges & Tracks
                     </CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <ul className="list-none space-y-3">
+                <CardContent className="space-y-4">
                     {collegeRecommendations.collegeRecommendations.map((rec, index) => (
-                        <li key={index} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                           <span>{rec.collegeName}</span>
-                           <Button asChild variant="ghost" size="sm">
-                                <a href={rec.websiteUrl} target="_blank" rel="noopener noreferrer">
-                                    Visit Site <ExternalLink className="ml-2" />
-                                </a>
-                           </Button>
-                        </li>
+                        <Card key={index} className="p-4 bg-muted/50">
+                            <div className="flex justify-between items-start">
+                                <h4 className="font-bold">{rec.collegeName}</h4>
+                                <Button asChild variant="ghost" size="sm">
+                                    <a href={rec.websiteUrl} target="_blank" rel="noopener noreferrer">
+                                        Visit Site <ExternalLink className="ml-2" />
+                                    </a>
+                                </Button>
+                            </div>
+                            <div className="mt-3 space-y-2 text-sm">
+                                <div className="flex items-start gap-2">
+                                    <Award className="w-4 h-4 mt-0.5 text-primary" />
+                                    <p><span className="font-semibold">Exams:</span> {rec.entranceExams.join(', ')}</p>
+                                </div>
+                                <div className="flex items-start gap-2">
+                                    <FileCheck2 className="w-4 h-4 mt-0.5 text-primary" />
+                                    <p><span className="font-semibold">Criteria:</span> {rec.admissionCriteria}</p>
+                                </div>
+                            </div>
+                        </Card>
                     ))}
-                    </ul>
                 </CardContent>
             </Card>
         )}

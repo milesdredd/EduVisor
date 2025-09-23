@@ -10,6 +10,8 @@ interface SavedCollege {
   collegeName: string;
   reason: string;
   websiteUrl?: string;
+  entranceExams: string[];
+  admissionCriteria: string;
 }
 
 interface UserData {

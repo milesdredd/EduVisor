@@ -11,14 +11,25 @@ import { useToast } from "@/hooks/use-toast";
 export function CollegeRecommendations() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { careerSuggestions, collegeRecommendations, setCollegeRecommendations } = useResultsStore();
+  const { quizAnswers, careerSuggestions, collegeRecommendations, setCollegeRecommendations } = useResultsStore();
 
   const handleFetchRecommendations = async () => {
     if (!careerSuggestions) return;
+
+    const educationLevel = quizAnswers?.educationLevel as string;
+    if (!educationLevel) {
+        toast({
+            variant: "destructive",
+            title: "Quiz not taken",
+            description: "Please take the assessment quiz to get college recommendations.",
+        });
+        return;
+    }
+
     setIsLoading(true);
     try {
       const suggestedCareers = careerSuggestions.suggestions.map(s => s.career);
-      const recommendations = await getCollegeRecommendations({ suggestedCareers });
+      const recommendations = await getCollegeRecommendations({ suggestedCareers, educationLevel });
       setCollegeRecommendations(recommendations);
     } catch (error) {
       console.error(error);
@@ -57,7 +68,7 @@ export function CollegeRecommendations() {
           <CardContent>
             <ul className="list-disc space-y-2 pl-5 text-muted-foreground">
               {collegeRecommendations.collegeRecommendations.map((rec, index) => (
-                <li key={index}>{rec}</li>
+                <li key={index}>{rec.collegeName}</li>
               ))}
             </ul>
           </CardContent>
