@@ -78,7 +78,7 @@ export function Header() {
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center space-x-2">
             <Image src="/icons/icon.png" alt="EduVisor Logo" width={30} height={30} />
-            <span className="font-bold hidden sm:inline-block">EduVisor</span>
+            <span className="font-bold">EduVisor</span>
           </Link>
         </div>
 
