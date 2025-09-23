@@ -142,7 +142,7 @@ export default function ProfilePage() {
       router.push('/quiz');
     };
 
-    const handleSaveCollege = (rec: { collegeName: string; reason: string; }) => {
+    const handleSaveCollege = (rec: { collegeName: string; reason: string; websiteUrl: string; }) => {
         store.addSavedCollege(rec);
         toast({
             title: "College Saved!",
@@ -275,7 +275,7 @@ export default function ProfilePage() {
                                                       <Button
                                                           variant="ghost"
                                                           size="icon"
-                                                          onClick={() => handleSaveCollege(rec)}
+                                                          onClick={() => handleSaveCollege({ collegeName: rec.collegeName, reason: rec.reason, websiteUrl: rec.websiteUrl })}
                                                           disabled={isSaved}
                                                           className="h-8 w-8"
                                                       >

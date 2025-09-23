@@ -9,6 +9,7 @@ import type { LucideIcon } from 'lucide-react';
 interface SavedCollege {
   collegeName: string;
   reason: string;
+  websiteUrl?: string;
 }
 
 interface UserData {

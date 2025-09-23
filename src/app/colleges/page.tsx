@@ -155,27 +155,36 @@ export default function CollegesPage() {
                                <p className="text-sm text-muted-foreground">{college.reason}</p>
                              </div>
                            </div>
-                           <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                    <Trash2 className="text-destructive" />
+                           <div className="flex items-center gap-2">
+                             {college.websiteUrl && (
+                                <Button asChild size="sm" variant="ghost">
+                                  <a href={college.websiteUrl} target="_blank" rel="noopener noreferrer">
+                                    <ExternalLink />
+                                  </a>
                                 </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    This will permanently remove '{college.collegeName}' from your Career Bucket.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleRemoveCollege(college.collegeName)}>
-                                    Remove
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                             )}
+                             <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                      <Trash2 className="text-destructive" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will permanently remove '{college.collegeName}' from your Career Bucket.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleRemoveCollege(college.collegeName)}>
+                                      Remove
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                           </div>
                         </div>
                     ))}
                 </CardContent>
